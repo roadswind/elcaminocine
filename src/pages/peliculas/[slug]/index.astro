@@ -1,0 +1,7 @@
+---
+import V from '../../../views/Film.astro';
+import { films } from '../../../lib/site';
+export const getStaticPaths = () => films.map((film) => ({ params: { slug: film.slug }, props: { film } }));
+const { film } = Astro.props;
+---
+<V lang="es" film={film} />

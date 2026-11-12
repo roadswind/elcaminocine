@@ -1,0 +1,9 @@
+{
+  "dropOpen": false,
+  "items": [
+    { "id": "camiseta", "es": "Camiseta ECC", "en": "ECC T-shirt", "noteEs": "Algodón pesado, isotipo al pecho.", "noteEn": "Heavyweight cotton, isotype on chest.", "price": "", "payLink": "", "image": "" },
+    { "id": "canguro", "es": "Canguro ECC", "en": "ECC Belt bag", "noteEs": "Para el rodaje y para la calle.", "noteEn": "For set and for the street.", "price": "", "payLink": "", "image": "" },
+    { "id": "print", "es": "Print — Nancy & Nancy", "en": "Print — Nancy & Nancy", "noteEs": "Frame de la película en papel fine art.", "noteEn": "Film frame on fine art paper.", "price": "", "payLink": "", "image": "/media/nancy-and-nancy/frame-01-800.webp" },
+    { "id": "llavero", "es": "Llavero isotipo", "en": "Isotype keychain", "noteEs": "El camino, en el bolsillo.", "noteEn": "The road, in your pocket.", "price": "", "payLink": "", "image": "" }
+  ]
+}

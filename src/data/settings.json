@@ -1,0 +1,25 @@
+{
+  "email": "",
+  "instagram": "",
+  "vimeo": "",
+  "reelVimeoId": "1057596782",
+  "waitlistEndpoint": "",
+  "incentives": {
+    "updated": "2026-11-12",
+    "smlmv": 1750905,
+    "trm": 3680,
+    "cinaRate": 35,
+    "cinaSaleRate": 90,
+    "ffcServicesRate": 40,
+    "ffcLogisticsRate": 20,
+    "minFilmSmlmv": 1800,
+    "minPostSmlmv": 360,
+    "minMusicVideoSmlmv": 1800,
+    "cinaQuota2026": "COP 350.000 millones",
+    "sources": [
+      { "label": "Comisión Fílmica Colombia — Incentivo CINA", "url": "https://comisionfilmicacolombia.com/incentivos/certificado-tributario-cina/" },
+      { "label": "Comisión Fílmica Colombia — Manual de Asignación de Recursos", "url": "https://comisionfilmicacolombia.com/mar/" },
+      { "label": "Ley 1556 de 2012", "url": "https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=48319" }
+    ]
+  }
+}

@@ -1,0 +1,60 @@
+---
+import fs from 'node:fs';
+import Base from '../layouts/Base.astro';
+import { ui, filmPath, pressPath, frameSrc, mailto, type Lang } from '../lib/site';
+interface Props { lang: Lang; film: any }
+const { lang, film } = Astro.props;
+const t = ui[lang]; const other = lang === 'es' ? 'en' : 'es';
+const size = (p: string) => { try { return (fs.statSync(`public${p}`).size / 1e6).toFixed(1) + ' MB'; } catch { return ''; } };
+const mail = mailto(`${t.press} — ${film.title}`);
+const meta = [t.format[film.format], film[lang].genre, film.runtime, film.year].filter(Boolean).join(' · ');
+---
+<Base lang={lang} title={`${t.press} · ${film.title}`} alt={pressPath(other, film.slug)} current="films" noindex solidHead image={film.frames ? frameSrc(film.slug, 1, 1600) : undefined}>
+  <div class="wrap page-head">
+    <p class="label"><a href={filmPath(lang, film.slug)}><b>← {t.backToFilm}</b></a></p>
+    <h1 style="margin-top:18px">{t.press}</h1>
+    <p class="lede"><em>{film.title}</em> — {meta}. {t.pressIntro}</p>
+  </div>
+  <div class="wrap cols">
+    <section>
+      <h2 class="label">{t.downloads}</h2>
+      <ul class="dl">
+        {film.press.map((p: any) => (
+          <li><a href={p.file} download>
+            <span class="th">{/\.(jpe?g|png|webp)$/i.test(p.file) && <img src={p.file.includes('still') ? frameSrc(film.slug, Number(p.file.match(/(\d+)\.jpg$/)?.[1] ?? 1), 800) : `/media/${film.slug}/poster-600.webp`} alt="" loading="lazy" />}</span>
+            <span class="nm">{p[lang]}<small class="label">{p.file.split('.').pop()?.toUpperCase()} · {size(p.file)}</small></span>
+            <span class="label"><b>{t.download} ↓</b></span>
+          </a></li>
+        ))}
+      </ul>
+      {mail && <p style="margin-top:28px"><a class="btn ghost" href={mail}>{t.contact} · {t.press}</a></p>}
+    </section>
+    <section class="txt">
+      {(['es', 'en'] as const).map((l) => (
+        <div lang={l}>
+          <h2 class="label">{l === 'es' ? 'Español' : 'English'}</h2>
+          {film[l].tagline && <p><em>{film[l].tagline}</em></p>}
+          <h3 class="label">Logline</h3><p>{film[l].logline}</p>
+          {film[l].synopsis && <><h3 class="label">{ui[l].synopsis}</h3><p>{film[l].synopsis}</p></>}
+          <h3 class="label">{ui[l].credits}</h3>
+          <p>{film.credits.map((k: any) => <>{k[l]}: {k.name}<br /></>)}</p>
+        </div>
+      ))}
+    </section>
+  </div>
+</Base>
+<style>
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 96px); align-items: start; }
+  .dl { list-style: none; margin: 16px 0 0; padding: 0; border-top: 1px solid var(--line); }
+  .dl a { display: grid; grid-template-columns: 96px 1fr auto; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); transition: background .2s, padding .2s; }
+  .dl a:hover { background: var(--bg-2); padding-inline: 12px; }
+  .th { aspect-ratio: 16 / 10; background: var(--bg-2); overflow: hidden; }
+  .th img { width: 100%; height: 100%; object-fit: cover; }
+  .nm { display: flex; flex-direction: column; gap: 4px; }
+  .nm small { font-size: 10.5px; }
+  .txt > div { margin-bottom: 44px; }
+  .txt h2 { color: var(--ink); border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 16px; }
+  .txt h3 { margin: 18px 0 6px; font-family: var(--mono); line-height: 1.4; }
+  .txt p { user-select: all; }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } .dl a { grid-template-columns: 72px 1fr auto; } }
+</style>

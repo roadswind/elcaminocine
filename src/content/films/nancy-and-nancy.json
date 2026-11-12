@@ -1,0 +1,56 @@
+{
+  "slug": "nancy-and-nancy",
+  "order": 1,
+  "title": "Nancy & Nancy",
+  "titleImage": "/media/nancy-and-nancy/title.png",
+  "format": "cortometraje",
+  "kind": "ficcion",
+  "status": "estreno",
+  "year": "2025",
+  "runtime": "7 min",
+  "frames": 6,
+  "focus": "50% 35%",
+  "poster": true,
+  "bts": 3,
+  "clip": "",
+  "trailerVimeoId": "",
+  "filmVimeoId": "",
+  "watch": "soon",
+  "es": {
+    "tagline": "Destruye tu celular. Ahora.",
+    "logline": "En las ruinas de su mente, Nancy busca inspiración en las aventuras y desvaríos de Madeleine y Josephine.",
+    "synopsis": "Frustrada por su falta de inspiración, Nancy, una joven artista, escarba en su propia mente a través de las aventuras de Madeleine y Josephine, un par de asesinas entrenadas que huyen del ejército de Mr. Kink luego de matarle. Allí, encuentra en los desvaríos de estas dos un ápice de genialidad, hasta que le es arrebatado tras la irrupción de un intruso desapercibido.",
+    "genre": "Ficción",
+    "note": "En una sociedad diluida por la inmediatez, la memoria se convierte en un recurso cada vez más escaso. Nancy & Nancy surge como un retrato íntimo de nuestra mente; poderosísima y, aun así, corroída por instrumentos diseñados para distraer nuestra atención y consumir nuestro tiempo. Este cortometraje, lleno de incógnitas y con pocas certezas, busca sacudir a su público con una dosis de triste realidad. Una ficción adornada con paisajes y atuendos fantásticos, diálogos de fantasía y un tono agridulce.",
+    "noteBy": "David Rodríguez, productor"
+  },
+  "en": {
+    "tagline": "Destroy your phone. Now.",
+    "logline": "In the ruins of her mind, Nancy seeks inspiration through the adventures and delusions of Madeleine and Josephine.",
+    "synopsis": "Frustrated by her lack of inspiration, Nancy, a young artist, digs into her own mind through the adventures of Madeleine and Josephine, a pair of trained assassins on the run from Mr. Kink’s army after killing him. There, she finds a glimpse of genius in their delusions—until it is snatched away after the sudden intrusion of an unnoticed stranger.",
+    "genre": "Fiction",
+    "note": "In a society diluted by immediacy, memory becomes an increasingly scarce resource. Nancy & Nancy emerges as an intimate portrait of our mind—powerful, yet corroded by instruments designed to distract our attention and consume our time. This short film, full of mysteries and few certainties, aims to shake its audience with a dose of harsh reality. A fiction adorned with fantastical landscapes and costumes, dreamlike dialogues, and a bittersweet tone.",
+    "noteBy": "David Rodríguez, producer"
+  },
+  "credits": [
+    { "es": "Dirección", "en": "Directed by", "name": "David Rodríguez" },
+    { "es": "Guion", "en": "Written by", "name": "David Rodríguez" },
+    { "es": "Producción", "en": "Produced by", "name": "David Rodríguez" },
+    { "es": "Reparto", "en": "Starring", "name": "Vanessa Gamba, Andrea Alméciga" },
+    { "es": "Dirección de fotografía", "en": "Director of Photography", "name": "Roadswind" }
+  ],
+  "specs": [
+    { "es": "Formato de rodaje", "en": "Shooting format", "value": "DCI 4K" },
+    { "es": "País", "en": "Country", "value": "Colombia" },
+    { "es": "Idioma", "en": "Language", "value": "Español" }
+  ],
+  "press": [
+    { "es": "Póster", "en": "Poster", "file": "/press/nancy-and-nancy/NancyAndNancy_poster.jpg" },
+    { "es": "Still 01", "en": "Still 01", "file": "/press/nancy-and-nancy/NancyAndNancy_still_01.jpg" },
+    { "es": "Still 02", "en": "Still 02", "file": "/press/nancy-and-nancy/NancyAndNancy_still_02.jpg" },
+    { "es": "Still 03", "en": "Still 03", "file": "/press/nancy-and-nancy/NancyAndNancy_still_03.jpg" },
+    { "es": "Still 04", "en": "Still 04", "file": "/press/nancy-and-nancy/NancyAndNancy_still_04.jpg" },
+    { "es": "Still 05", "en": "Still 05", "file": "/press/nancy-and-nancy/NancyAndNancy_still_05.jpg" },
+    { "es": "Still 06", "en": "Still 06", "file": "/press/nancy-and-nancy/NancyAndNancy_still_06.jpg" }
+  ]
+}

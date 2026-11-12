@@ -1,0 +1,124 @@
+---
+import Base from '../layouts/Base.astro';
+import Player from '../components/Player.astro';
+import { films, ui, routes, filmPath, pressPath, frameSrc, frameSet, mailto, type Lang } from '../lib/site';
+interface Props { lang: Lang; film: any }
+const { lang, film } = Astro.props;
+const t = ui[lang]; const r = routes[lang]; const c = film[lang];
+const other = lang === 'es' ? 'en' : 'es';
+const idx = films.findIndex((f) => f.slug === film.slug);
+const next = films[(idx + 1) % films.length];
+const dev = film.status !== 'estreno' && film.status !== 'disponible';
+const meta = [t.format[film.format], c.genre, film.runtime, film.year].filter(Boolean);
+const support = mailto(`${film.title} — ${t.support}`);
+const collab = mailto(`${film.title} — ${t.collaborate}`);
+const notify = mailto(`${film.title} — ${t.notify}`);
+const frames = Array.from({ length: film.frames }, (_, i) => i + 1);
+const bts = Array.from({ length: film.bts || 0 }, (_, i) => i + 1);
+const hasPress = film.press?.length > 0;
+---
+<Base lang={lang} title={film.title} description={c.logline || undefined} alt={filmPath(other, film.slug)} current="films" image={film.frames ? frameSrc(film.slug, 1, 1600) : undefined}>
+  <Player vimeoId={film.trailerVimeoId} poster={film.frames ? frameSrc(film.slug, 1, 1600) : ''} posterSet={film.frames ? frameSet(film.slug, 1) : undefined} label={t.playTrailer} soonLabel={dev ? t.status[film.status] : t.trailerSoon} focus={film.focus} title={film.title} />
+
+  <div class="wrap top">
+    <div class="ttl">
+      <p class="tag" data-status={film.status}>{t.status[film.status]}</p>
+      <h1>{film.title}</h1>
+      <p class="label">{meta.map((m, i) => <>{i > 0 && ' · '}<b>{m}</b></>)}</p>
+    </div>
+    <div class="lead">
+      {c.tagline && <p class="tl"><em>{c.tagline}</em></p>}
+      {c.logline ? <p class="ll">{c.logline}</p> : <p class="ll muted">{t.detailsSoon}</p>}
+      <div class="cta">
+        {!dev && film.watch === 'public' && film.filmVimeoId && <a class="btn" href={`${r.watch}#${film.slug}`}>{t.watchFilm} <span class="arr">→</span></a>}
+        {!dev && film.watch !== 'public' && <a class="btn" href={`${r.watch}#${film.slug}`}>{t.watchSoon} <span class="arr">→</span></a>}
+        {!dev && notify && <a class="btn ghost" href={notify}>{t.notify}</a>}
+        {dev && support && <a class="btn" href={support}>{t.support} <span class="arr">→</span></a>}
+        {dev && collab && <a class="btn ghost" href={collab}>{t.collaborate}</a>}
+        {hasPress && <a class="btn ghost" href={pressPath(lang, film.slug)}>{t.press}</a>}
+      </div>
+      {dev && <p class="label" style="margin-top:18px;max-width:52ch;line-height:1.7">{t.supportLead}</p>}
+    </div>
+  </div>
+
+  {(c.synopsis || film.credits.length > 0) && (
+    <div class="wrap info">
+      {c.synopsis && (
+        <section class="reveal">
+          <h2 class="label">{t.synopsis}</h2>
+          <p class="syn">{c.synopsis}</p>
+        </section>
+      )}
+      <section class="reveal">
+        {film.credits.length > 0 && <>
+          <h2 class="label">{t.credits}</h2>
+          <dl>{film.credits.map((k: any) => <div><dt>{k[lang]}</dt><dd>{k.name}</dd></div>)}</dl>
+        </>}
+        {film.specs.length > 0 && <>
+          <h2 class="label" style="margin-top:36px">{t.specs}</h2>
+          <dl>{film.specs.map((k: any) => <div><dt>{k[lang]}</dt><dd>{k.value}</dd></div>)}</dl>
+        </>}
+      </section>
+    </div>
+  )}
+
+  {frames.length > 1 && (
+    <section class="section" style="padding-bottom:0">
+      <div class="wrap section-head"><h2 class="label">{t.frames} · {String(frames.length).padStart(2, '0')}</h2></div>
+      <div class="row wide">
+        {frames.map((n) => <figure class="fr"><img src={frameSrc(film.slug, n, 1600)} srcset={frameSet(film.slug, n)} sizes="(max-width: 700px) 86vw, 900px" alt={`${film.title} — frame ${n}`} loading="lazy" /></figure>)}
+      </div>
+    </section>
+  )}
+
+  {c.note && (
+    <section class="wrap section note reveal">
+      <h2 class="label">{t.note}</h2>
+      <blockquote><p>{c.note}</p><footer class="label"><b>— {c.noteBy}</b></footer></blockquote>
+    </section>
+  )}
+
+  {bts.length > 0 && (
+    <section class="section" style="padding-top:0">
+      <div class="wrap section-head"><h2 class="label">{t.bts}</h2></div>
+      <div class="row bts">
+        {bts.map((n) => <figure><img src={`/media/${film.slug}/bts-${String(n).padStart(2, '0')}-800.webp`} srcset={`/media/${film.slug}/bts-${String(n).padStart(2, '0')}-800.webp 800w, /media/${film.slug}/bts-${String(n).padStart(2, '0')}-1600.webp 1600w`} sizes="(max-width:700px) 78vw, 560px" alt={`${film.title} — ${t.bts}`} loading="lazy" /></figure>)}
+      </div>
+    </section>
+  )}
+
+  <a class="next" href={filmPath(lang, next.slug)}>
+    {next.frames > 0 && <img src={frameSrc(next.slug, 1, 1600)} srcset={frameSet(next.slug, 1)} sizes="100vw" alt="" loading="lazy" style={`object-position:${next.focus}`} />}
+    <span class="wrap"><span class="label"><b>{t.next} →</b></span><span class="nt">{next.title}</span></span>
+  </a>
+</Base>
+<style>
+  .top { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(24px, 5vw, 96px); padding-block: clamp(28px, 4vw, 64px) clamp(40px, 6vw, 90px); align-items: start; }
+  .ttl h1 { font-size: clamp(60px, 10.5vw, 190px); margin: 14px 0 18px; }
+  .tl { font-size: clamp(22px, 2.2vw, 36px); line-height: 1.18; margin-bottom: 18px; }
+  .ll { font-size: clamp(18px, 1.35vw, 23px); max-width: 44ch; }
+  .muted { color: var(--muted); font-style: italic; }
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .info { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(24px, 5vw, 96px); padding-block: clamp(36px, 5vw, 80px); border-top: 1px solid var(--line); }
+  .info h2 { margin-bottom: 18px; }
+  .syn { font-size: clamp(19px, 1.5vw, 25px); line-height: 1.45; max-width: 46ch; }
+  dl { margin: 0; }
+  dl div { display: grid; grid-template-columns: minmax(120px, 42%) 1fr; gap: 16px; padding: 11px 0; border-top: 1px solid var(--line); }
+  dl div:last-child { border-bottom: 1px solid var(--line); }
+  dt { font-family: var(--mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding-top: 4px; }
+  dd { margin: 0; }
+  .fr { margin: 0; aspect-ratio: 4096 / 2160; background: var(--bg-2); overflow: hidden; }
+  .fr img { width: 100%; height: 100%; object-fit: cover; }
+  .bts figure { margin: 0; aspect-ratio: 3 / 2; overflow: hidden; background: var(--bg-2); }
+  .bts img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; }
+  .note { max-width: 1100px; margin-inline: 0; }
+  .note blockquote { margin: 18px 0 0; }
+  .note blockquote p { font-style: italic; font-size: clamp(22px, 2.5vw, 40px); line-height: 1.25; }
+  .next { display: block; position: relative; min-height: 46vh; overflow: hidden; background: var(--bg-2); border-top: 1px solid var(--line); }
+  .next img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .5; transition: opacity .5s, transform 1.4s cubic-bezier(.2,.7,.2,1); }
+  .next:hover img { opacity: .75; transform: scale(1.03); }
+  .next .wrap { position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; min-height: 46vh; padding-block: clamp(24px, 4vw, 56px); }
+  .next .nt { font-family: var(--display); text-transform: uppercase; font-size: clamp(54px, 9vw, 160px); line-height: .9; }
+  :global(.site-foot) { margin-top: 0 !important; }
+  @media (max-width: 860px) { .top, .info { grid-template-columns: 1fr; } }
+</style>

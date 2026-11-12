@@ -1,0 +1,151 @@
+---
+import Base from '../layouts/Base.astro';
+import FilmCard from '../components/FilmCard.astro';
+import { films, ui, routes, filmPath, frameSrc, frameSet, type Lang } from '../lib/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang]; const r = routes[lang];
+const slides = films.filter((f) => f.frames > 0);
+const formats = ['cortometraje', 'largometraje', 'serie'] as const;
+const feature = films.find((f) => f.slug === 'nancy-and-nancy');
+const L = lang === 'es'
+  ? { catalog: 'Catálogo', prodKicker: 'Para productores extranjeros', prodTitle: 'Filma en Colombia.', prodBody: 'Colombia devuelve hasta el 35 % del gasto elegible de producciones internacionales. Te explicamos cómo funciona y calculamos tu incentivo en un minuto.', prodCta: 'Calcula tu incentivo', aboutCta: 'Conócenos', manifesto: 'El camino se hace película a película.' }
+  : { catalog: 'Catalogue', prodKicker: 'For international producers', prodTitle: 'Shoot in Colombia.', prodBody: 'Colombia returns up to 35% of eligible spend for international productions. We explain how it works and estimate your incentive in one minute.', prodCta: 'Estimate your incentive', aboutCta: 'About us', manifesto: 'The road is made one film at a time.' };
+---
+<Base lang={lang} alt={routes[lang === 'es' ? 'en' : 'es'].home}>
+  <link slot="head" rel="preload" as="image" href={frameSrc(slides[0].slug, 1, 1600)} imagesrcset={frameSet(slides[0].slug, 1)} imagesizes="100vw" />
+  <section class="hero" aria-roledescription="carousel" aria-label={t.films}>
+    {slides.map((f, i) => (
+      <article class:list={['slide', { on: i === 0 }]} data-i={i} aria-hidden={i === 0 ? 'false' : 'true'}>
+        <img src={frameSrc(f.slug, 1, 1600)} srcset={frameSet(f.slug, 1)} sizes="100vw" alt="" loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} style={`object-position:${f.focus}`} />
+        <div class="shade"></div>
+        <div class="copy wrap">
+          <p class="tag" data-status={f.status}>{t.status[f.status]} · {t.format[f.format]}</p>
+          {f.titleImage
+            ? <h2 class="has-img"><img src={f.titleImage} alt={f.title} /></h2>
+            : <h2>{f.title}</h2>}
+          {f[lang].tagline && <p class="tl"><em>{f[lang].tagline}</em></p>}
+          <a class="btn" href={filmPath(lang, f.slug)} tabindex={i === 0 ? 0 : -1}>{f.status === 'estreno' ? t.viewFilm : t.viewProject} <span class="arr">→</span></a>
+        </div>
+      </article>
+    ))}
+    <div class="ticks wrap" role="tablist">
+      {slides.map((f, i) => (
+        <button role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-i={i} class:list={[{ on: i === 0 }]}>
+          <span class="bar"><i></i></span>
+          <span class="n">{String(i + 1).padStart(2, '0')}</span><span class="tt">{f.title}</span>
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <section class="section" style="padding-bottom:0">
+    <div class="wrap section-head reveal"><h2>{t.formatPlural.cortometraje}</h2><a class="label" href={r.films}><b>{t.allFilms} →</b></a></div>
+    <div class="row reveal">{films.filter((f) => f.format === 'cortometraje').map((f) => <FilmCard film={f} lang={lang} />)}</div>
+  </section>
+
+  {feature && (
+    <section class="section feature reveal">
+      <a class="band" href={filmPath(lang, feature.slug)}>
+        <img src={frameSrc(feature.slug, 2, 1600)} srcset={frameSet(feature.slug, 2)} sizes="100vw" alt="" loading="lazy" />
+        <div class="q wrap">
+          <p class="label"><b>{feature.title}</b> · {t.status[feature.status]}</p>
+          <blockquote>{feature[lang].logline}</blockquote>
+        </div>
+      </a>
+    </section>
+  )}
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap section-head reveal"><h2>{t.formatPlural.largometraje} & {t.formatPlural.serie}</h2></div>
+    <div class="row wide reveal">{films.filter((f) => f.format !== 'cortometraje').map((f) => <FilmCard film={f} lang={lang} sizes="(max-width: 700px) 86vw, 900px" />)}</div>
+  </section>
+
+  <section class="wrap prod reveal">
+    <div>
+      <p class="label">{L.prodKicker}</p>
+      <h2>{L.prodTitle}</h2>
+    </div>
+    <div>
+      <p class="big-n" aria-hidden="true">35<sup>%</sup></p>
+      <p>{L.prodBody}</p>
+      <a class="btn" href={r.producers}>{L.prodCta} <span class="arr">→</span></a>
+    </div>
+  </section>
+
+  <section class="wrap mani reveal">
+    <p>{L.manifesto}</p>
+    <a class="btn ghost" href={r.about}>{L.aboutCta} <span class="arr">→</span></a>
+  </section>
+</Base>
+
+<style>
+  .hero { position: relative; height: calc(100svh - var(--tab-h)); min-height: 560px; overflow: hidden; background: #000; }
+  .slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 1.1s ease, visibility 0s linear 1.1s; }
+  .slide.on { opacity: 1; visibility: visible; transition: opacity 1.1s ease; z-index: 1; }
+  .slide > img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.02); }
+  .slide.on > img { animation: drift 9s ease-out forwards; }
+  @keyframes drift { from { transform: scale(1.09); } to { transform: scale(1.02); } }
+  .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,10,9,.94) 0%, rgba(11,10,9,.42) 34%, rgba(11,10,9,0) 62%), linear-gradient(to right, rgba(11,10,9,.5), rgba(11,10,9,0) 55%); }
+  .copy { position: absolute; inset: auto 0 0 0; padding-bottom: clamp(108px, 15vh, 160px); }
+  .copy h2 { font-size: clamp(68px, 13.5vw, 230px); margin: 14px 0 10px; max-width: 12ch; }
+  .copy h2.has-img { max-width: none; }
+  .copy h2.has-img img { width: min(78vw, 820px); height: auto; margin-left: -1%; }
+  .copy .tl { font-size: clamp(19px, 1.9vw, 30px); margin-bottom: 26px; max-width: 30ch; line-height: 1.25; }
+  .slide .copy > * { opacity: 0; transform: translateY(16px); }
+  .slide.on .copy > * { opacity: 1; transform: none; transition: opacity .9s ease .35s, transform .9s cubic-bezier(.2,.7,.2,1) .35s; }
+  .slide.on .copy > *:nth-child(2) { transition-delay: .45s; } .slide.on .copy > *:nth-child(3) { transition-delay: .55s; } .slide.on .copy > *:nth-child(4) { transition-delay: .65s; }
+  .ticks { position: absolute; z-index: 3; inset: auto 0 0 0; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 12px; padding-bottom: clamp(18px, 3vh, 34px); }
+  .ticks button { all: unset; cursor: pointer; display: block; padding-top: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); min-width: 0; }
+  .ticks button:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+  .ticks .bar { display: block; height: 2px; background: rgba(236,231,222,.25); margin-bottom: 10px; overflow: hidden; }
+  .ticks .bar i { display: block; height: 100%; width: 0; background: var(--ink); }
+  .ticks button.on { color: var(--ink); }
+  .ticks button.on .bar i { animation: fill var(--dur, 7s) linear forwards; }
+  .hero.paused .ticks button.on .bar i { animation-play-state: paused; }
+  @keyframes fill { to { width: 100%; } }
+  .ticks .n { margin-right: 10px; }
+  .ticks .tt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  @media (max-width: 700px) { .ticks .tt { display: none; } .copy { padding-bottom: 84px; } }
+
+  .feature .band { display: block; position: relative; aspect-ratio: 2.39 / 1; min-height: 340px; width: 100%; overflow: hidden; }
+  .feature img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .feature .band::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(11,10,9,.78), rgba(11,10,9,.05) 70%); }
+  .feature .q { position: absolute; z-index: 1; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+  .feature blockquote { margin: 0; font-style: italic; font-size: clamp(22px, 3vw, 48px); line-height: 1.15; max-width: 22ch; }
+
+  .prod { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(24px, 5vw, 90px); align-items: end; padding-block: clamp(48px, 7vw, 110px); border-top: 1px solid var(--line); }
+  .prod h2 { font-size: clamp(64px, 11vw, 190px); margin-top: 14px; }
+  .prod .big-n { font-family: var(--display); font-size: clamp(90px, 12vw, 200px); line-height: .8; margin: 0 0 18px; color: var(--accent); }
+  .prod .big-n sup { font-size: .45em; vertical-align: top; }
+  .prod p { max-width: 40ch; }
+  @media (max-width: 800px) { .prod { grid-template-columns: 1fr; } }
+  .mani { border-top: 1px solid var(--line); padding-block: clamp(56px, 9vw, 140px) 0; display: flex; flex-direction: column; gap: 28px; align-items: flex-start; }
+  .mani p { font-style: italic; font-size: clamp(30px, 5.4vw, 92px); line-height: 1.04; max-width: 16ch; margin: 0; letter-spacing: -.01em; }
+</style>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('.hero');
+  if (hero) {
+    const slides = [...hero.querySelectorAll<HTMLElement>('.slide')];
+    const ticks = [...hero.querySelectorAll<HTMLButtonElement>('.ticks button')];
+    const DUR = 7000; let i = 0; let timer: number | undefined; let startX = 0;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const go = (n: number) => {
+      i = (n + slides.length) % slides.length;
+      slides.forEach((s, k) => { s.classList.toggle('on', k === i); s.setAttribute('aria-hidden', String(k !== i)); s.querySelector('a')?.setAttribute('tabindex', k === i ? '0' : '-1'); });
+      ticks.forEach((b, k) => { b.classList.remove('on'); b.setAttribute('aria-selected', String(k === i)); });
+      void hero.offsetWidth; ticks[i].classList.add('on');
+      schedule();
+    };
+    const schedule = () => { clearTimeout(timer); if (!reduce && !hero.classList.contains('paused') && slides.length > 1) timer = window.setTimeout(() => go(i + 1), DUR); };
+    ticks.forEach((b, k) => b.addEventListener('click', () => go(k)));
+    hero.addEventListener('mouseenter', () => { hero.classList.add('paused'); clearTimeout(timer); });
+    hero.addEventListener('mouseleave', () => { hero.classList.remove('paused'); go(i); });
+    hero.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') go(i + 1); if (e.key === 'ArrowLeft') go(i - 1); });
+    hero.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+    hero.addEventListener('touchend', (e) => { const dx = e.changedTouches[0].clientX - startX; if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1)); }, { passive: true });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) clearTimeout(timer); else schedule(); });
+    schedule();
+  }
+</script>

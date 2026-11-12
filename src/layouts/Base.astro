@@ -1,0 +1,115 @@
+---
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/global.css';
+import { routes, ui, settings, mailto, type Lang } from '../lib/site';
+
+interface Props { lang: Lang; title?: string; description?: string; alt: string; image?: string; current?: string; noindex?: boolean; solidHead?: boolean }
+const { lang, title, description, alt, image = '/media/nancy-and-nancy/frame-01-1600.webp', current = '', noindex = false, solidHead = false } = Astro.props;
+const t = ui[lang];
+const r = routes[lang];
+const fullTitle = title ? `${title} — EL CAMINO CINE` : `EL CAMINO CINE — ${t.tagline}`;
+const desc = description ?? (lang === 'es'
+  ? 'EL CAMINO CINE es una productora de cine colombiana. Películas, series y servicios de producción en Colombia.'
+  : 'EL CAMINO CINE is a Colombian film production company. Films, series and production services in Colombia.');
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const altUrl = new URL(alt, Astro.site).href;
+const ogImage = new URL(image, Astro.site).href;
+const links = [
+  { key: 'films', href: r.films, label: t.films, short: t.films },
+  { key: 'watch', href: r.watch, label: t.watch, short: t.watch.split(' ')[0] },
+  { key: 'producers', href: r.producers, label: t.producers, short: t.producersShort },
+  { key: 'shop', href: r.shop, label: t.shop, short: t.shop },
+  { key: 'about', href: r.about, label: t.about, short: t.about },
+];
+const mail = mailto(lang === 'es' ? 'Hola, EL CAMINO CINE' : 'Hello, EL CAMINO CINE');
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={lang} href={canonical} />
+    <link rel="alternate" hreflang={lang === 'es' ? 'en' : 'es'} href={altUrl} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="EL CAMINO CINE" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_CO' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0b0a09" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-180.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preload" href="/fonts/ECCDisplay-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip" href="#main">{t.skip}</a>
+    <header class:list={['site-head', { solid: solidHead }]} data-solid={solidHead ? '1' : '0'}>
+      <a class="brand" href={r.home} aria-label="EL CAMINO CINE">
+        <img src="/icons/isotipo-white.png" alt="" width="26" height="29" />
+        <span>EL CAMINO CINE</span>
+      </a>
+      <nav class="nav" aria-label={t.menu}>
+        {links.map((l) => <a href={l.href} aria-current={current === l.key ? 'page' : undefined}>{l.label}</a>)}
+        <a class="lang" href={alt} hreflang={lang === 'es' ? 'en' : 'es'} lang={lang === 'es' ? 'en' : 'es'}>{lang === 'es' ? 'EN' : 'ES'}<span class="sr" style="position:absolute;left:-9999px"> {t.langSwitch}</span></a>
+      </nav>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-foot">
+      <div class="wrap">
+        <div class="big" aria-hidden="true">El Camino Cine</div>
+        <div class="cols">
+          <nav aria-label="Footer">
+            {links.map((l) => <a href={l.href}>{l.label}</a>)}
+            {mail && <a href={mail}>{t.contact}</a>}
+            {settings.instagram && <a href={settings.instagram} rel="noopener">Instagram</a>}
+            {settings.vimeo && <a href={settings.vimeo} rel="noopener">Vimeo</a>}
+          </nav>
+          <p class="label" style="margin:0">© {new Date().getFullYear()} EL CAMINO CINE · {t.madeIn}</p>
+        </div>
+      </div>
+    </footer>
+    <nav class="tabbar" aria-label={t.menu}>
+      {links.map((l) => <a href={l.href} aria-current={current === l.key ? 'page' : undefined}><i></i>{l.short}</a>)}
+    </nav>
+    <div class="grain" aria-hidden="true"></div>
+    <script is:inline>
+      (function () {
+        var head = document.querySelector('.site-head');
+        if (head && head.dataset.solid !== '1') {
+          var on = function () { head.classList.toggle('solid', window.scrollY > 40); };
+          on(); window.addEventListener('scroll', on, { passive: true });
+        }
+        var els = document.querySelectorAll('.reveal');
+        if ('IntersectionObserver' in window) {
+          var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+          els.forEach(function (el) { io.observe(el); });
+        } else { els.forEach(function (el) { el.classList.add('in'); }); }
+        // tarjetas: al pasar el cursor, recorre frames o reproduce el clip
+        document.querySelectorAll('.card[data-live]').forEach(function (card) {
+          var alts = card.querySelectorAll('img.alt'); var vid = card.querySelector('video'); var timer = null; var i = -1;
+          function start() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (vid) { vid.classList.add('on'); var p = vid.play(); if (p && p.catch) p.catch(function () {}); return; }
+            if (!alts.length || timer) return;
+            var step = function () { alts.forEach(function (a) { a.classList.remove('on'); }); i = (i + 1) % (alts.length + 1); if (i < alts.length) { var a = alts[i]; if (!a.src) a.src = a.dataset.src; a.classList.add('on'); } };
+            step(); timer = setInterval(step, 1500);
+          }
+          function stop() { if (vid) { vid.classList.remove('on'); vid.pause(); } clearInterval(timer); timer = null; i = -1; alts.forEach(function (a) { a.classList.remove('on'); }); }
+          card.addEventListener('mouseenter', start); card.addEventListener('mouseleave', stop);
+          card.addEventListener('focus', start); card.addEventListener('blur', stop);
+        });
+        if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('/sw.js').catch(function () {}); }
+      })();
+    </script>
+  </body>
+</html>

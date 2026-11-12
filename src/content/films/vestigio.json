@@ -1,0 +1,23 @@
+{
+  "slug": "vestigio",
+  "order": 5,
+  "title": "Vestigio",
+  "format": "serie",
+  "kind": "ficcion",
+  "status": "desarrollo",
+  "year": "",
+  "runtime": "",
+  "frames": 1,
+  "focus": "50% 50%",
+  "poster": false,
+  "bts": 0,
+  "clip": "/media/vestigio/clip.mp4",
+  "trailerVimeoId": "",
+  "filmVimeoId": "",
+  "watch": "none",
+  "es": { "tagline": "", "logline": "", "synopsis": "", "genre": "Ficción", "note": "", "noteBy": "" },
+  "en": { "tagline": "", "logline": "", "synopsis": "", "genre": "Fiction", "note": "", "noteBy": "" },
+  "credits": [],
+  "specs": [],
+  "press": []
+}

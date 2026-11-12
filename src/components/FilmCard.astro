@@ -1,0 +1,21 @@
+---
+import { ui, filmPath, frameSrc, frameSet, type Lang } from '../lib/site';
+interface Props { film: any; lang: Lang; sizes?: string; eager?: boolean }
+const { film, lang, sizes = '(max-width: 700px) 80vw, 560px', eager = false } = Astro.props;
+const t = ui[lang];
+const alts = film.frames > 1 ? Array.from({ length: Math.min(film.frames, 5) - 1 }, (_, i) => i + 2) : [];
+---
+<a class:list={['card', { 'type-only': !film.frames }]} href={filmPath(lang, film.slug)} data-live data-format={film.format} data-kind={film.kind}>
+  {film.frames ? (
+    <img class="base" src={frameSrc(film.slug, 1, 800)} srcset={frameSet(film.slug, 1)} sizes={sizes} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" style={`object-position:${film.focus}`} />
+  ) : (
+    <div class="ghost" aria-hidden="true">{film.title}</div>
+  )}
+  {!film.clip && alts.map((n) => <img class="alt" data-src={frameSrc(film.slug, n, 800)} alt="" style={`object-position:${film.focus}`} />)}
+  {film.clip && <video src={film.clip} muted loop playsinline preload="none"></video>}
+  <span class="fmt label">{t.format[film.format]} · {t.kind[film.kind]}</span>
+  <span class="meta">
+    <h3>{film.title}</h3>
+    <span class="tag" data-status={film.status}>{t.status[film.status]}</span>
+  </span>
+</a>

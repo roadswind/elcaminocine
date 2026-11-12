@@ -1,0 +1,282 @@
+---
+import Base from '../layouts/Base.astro';
+import { ui, routes, settings, mailto, frameSrc, frameSet, type Lang } from '../lib/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const es = lang === 'es'; const t = ui[lang];
+const inc = settings.incentives;
+const fmtCOP = (n: number) => 'COP ' + new Intl.NumberFormat(es ? 'es-CO' : 'en-US').format(Math.round(n));
+const fmtUSD = (n: number) => 'USD ' + new Intl.NumberFormat(es ? 'es-CO' : 'en-US').format(Math.round(n));
+const minFilm = inc.minFilmSmlmv * inc.smlmv; const minPost = inc.minPostSmlmv * inc.smlmv;
+const updated = new Date(inc.updated + 'T12:00:00').toLocaleDateString(es ? 'es-CO' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const mail = mailto(es ? 'Producción en Colombia — consulta' : 'Production in Colombia — inquiry');
+const L = es ? {
+  title: 'Para productores', h1a: 'Filma en', h1b: 'Colombia', lede: `Colombia devuelve hasta el ${inc.cinaRate} % del gasto elegible de las producciones internacionales. Aquí está cómo funciona, cuánto podrías recuperar y cómo podemos producir contigo.`,
+  calc: 'Calcula tu incentivo', talk: 'Hablemos',
+  how: 'Cómo funciona', steps: [
+    ['Elige el incentivo', 'Colombia ofrece dos mecanismos para obras extranjeras: el certificado tributario CINA y la contraprestación en efectivo del Fondo Fílmico Colombia (FFC). No son acumulables sobre el mismo gasto.'],
+    ['Contrata en Colombia', 'El proyecto debe vincular una sociedad de servicios cinematográficos inscrita ante el Ministerio de las Culturas o un coproductor colombiano. El gasto elegible es el contratado con empresas y personas colombianas.'],
+    ['Postula y ejecuta', 'El Comité Promoción Fílmica Colombia evalúa el proyecto. Los recursos se administran a través de una fiducia y una auditoría externa certifica el gasto.'],
+    ['Recibe el incentivo', 'Acreditado el gasto, se emite el CINA —que puedes vender a contribuyentes colombianos— o se desembolsa la contraprestación del FFC.'],
+  ],
+  two: 'Dos incentivos',
+  cinaT: 'CINA', cinaS: 'Certificado de Inversión Audiovisual', cinaB: `Descuento tributario transferible equivalente al ${inc.cinaRate} % del gasto en servicios audiovisuales y logísticos audiovisuales contratados en Colombia. Está dirigido a productores extranjeros no declarantes de renta en el país, que lo negocian con contribuyentes colombianos.`,
+  cinaL: ['Películas, series, videos musicales y otros formatos', 'También proyectos de solo postproducción', `Cupo 2026: ${inc.cinaQuota2026}, el más alto hasta hoy`],
+  ffcT: 'FFC', ffcS: 'Contraprestación del Fondo Fílmico Colombia', ffcB: `Reintegro en efectivo del ${inc.ffcServicesRate} % del gasto en servicios audiovisuales y del ${inc.ffcLogisticsRate} % del gasto en servicios logísticos (hotelería, alimentación y transporte).`,
+  ffcL: ['Orientado principalmente a obras cinematográficas', 'Recursos anuales limitados', 'Pago directo al productor'],
+  mins: 'Gasto mínimo en Colombia · 2026', minRows: [['Películas y series', `${inc.minFilmSmlmv.toLocaleString('es-CO')} SMLMV`, fmtCOP(minFilm)], ['Solo postproducción (CINA)', `${inc.minPostSmlmv} SMLMV`, fmtCOP(minPost)], ['Videos musicales (paquete)', `${inc.minMusicVideoSmlmv.toLocaleString('es-CO')} SMLMV`, fmtCOP(inc.minMusicVideoSmlmv * inc.smlmv)]],
+  minNote: 'Las series y los paquetes tienen además un gasto promedio mínimo por capítulo o por video. El cupo anual puede agotarse antes de terminar el año: en 2025 se agotó a comienzos de septiembre.',
+  cT: 'Calculadora', cLede: 'Ingresa tu presupuesto de gasto en Colombia y te decimos si el proyecto alcanza el mínimo y cuánto podría recuperar.',
+  type: 'Tipo de proyecto', types: ['Película o serie', 'Solo postproducción', 'Videos musicales'], cur: 'Moneda',
+  sa: 'Gasto en servicios audiovisuales', saH: 'Equipo técnico y artístico, equipos, locaciones, postproducción.', sl: 'Gasto en servicios logísticos', slH: 'Hotelería, alimentación y transporte.',
+  trm: 'Tasa de cambio (COP por USD)', sale: 'Valor de venta del CINA (% del valor nominal)', saleH: 'El certificado se negocia con descuento; el porcentaje depende del mercado.',
+  ok: 'Elegible', no: 'Aún no elegible', total: 'Gasto total en Colombia', min: 'Mínimo requerido', cina: 'Certificado CINA', cinaNet: 'Estimado al venderlo', ffc: 'Contraprestación FFC', ffcNA: 'No aplica a esta ruta',
+  noBody: 'Tu proyecto no alcanza el gasto mínimo del incentivo. Aun así podemos trabajar juntos: te asesoramos para estructurarlo o lo producimos contigo en Colombia.', noCta: 'Explorar otras formas de trabajar', okCta: 'Hablemos de tu proyecto', missing: 'Te faltan',
+  disc: 'Estimación orientativa. No constituye asesoría legal ni tributaria. Los incentivos están sujetos a aprobación del Comité Promoción Fílmica Colombia, a la disponibilidad de cupo y a la normativa vigente.',
+  svc: 'Qué hacemos', svcs: [['Producción', 'Producción y producción en línea en Colombia: equipo, locaciones, permisos, logística y presupuesto, de la preproducción al último día de rodaje.'], ['Postproducción', 'Edición y corrección de color con flujos de trabajo DCI 4K y entregables para sala y plataformas.'], ['Estructuración', 'Te acompañamos a definir la ruta de incentivo, el esquema de contratación y los aliados locales adecuados para tu proyecto.']],
+  exp: 'Experiencia en servicios de producción: Bertha, de Laura Asprilla (beca de creación IDARTES 2023; Encuentro Nacional de Cortometrajes 2024, 22 Bogoshorts) y Hyper, de Alejandro Garzón (coproducción Colombia–Indonesia; In Vitro BFM 2023).',
+  faq: 'Preguntas frecuentes', faqs: [
+    ['¿Puedo combinar CINA y FFC?', 'No sobre el mismo gasto. Cada proyecto postula a uno de los dos mecanismos; la calculadora muestra ambos para que compares.'],
+    ['¿Un proyecto de solo postproducción puede aplicar?', `Sí, al CINA, si cumple el gasto mínimo (${fmtCOP(minPost)}) y se presenta como proyecto independiente.`],
+    ['¿Qué pasa si mi proyecto no alcanza el mínimo?', 'No accede al incentivo, pero Colombia sigue siendo competitiva en costos, talento y locaciones. Podemos producir contigo o asesorarte.'],
+    ['¿Quién recibe el CINA?', 'El productor extranjero. Como no declara renta en Colombia, lo transfiere a un contribuyente colombiano, que lo usa como descuento en su impuesto de renta.'],
+    ['¿Hasta cuándo está vigente?', 'El marco de la Ley 1556 está vigente hasta 2032. Los cupos y los mínimos se actualizan cada año.'],
+  ],
+  src: 'Fuentes oficiales', upd: 'Última actualización', end: 'Cuéntanos tu proyecto.',
+} : {
+  title: 'For producers', h1a: 'Shoot in', h1b: 'Colombia', lede: `Colombia returns up to ${inc.cinaRate}% of eligible spend for international productions. Here is how it works, how much you could recover and how we can produce with you.`,
+  calc: 'Estimate your incentive', talk: 'Let’s talk',
+  how: 'How it works', steps: [
+    ['Choose the incentive', 'Colombia offers two mechanisms for foreign works: the CINA tax certificate and the cash rebate from the Colombia Film Fund (FFC). They cannot be combined on the same spend.'],
+    ['Contract in Colombia', 'The project must engage a film services company registered with the Ministry of Cultures, or a Colombian co-producer. Eligible spend is what you contract with Colombian companies and individuals.'],
+    ['Apply and execute', 'The Colombian Film Promotion Committee evaluates the project. Funds are managed through a trust, and an external audit certifies the spend.'],
+    ['Receive the incentive', 'Once the spend is certified, the CINA is issued — which you can sell to Colombian taxpayers — or the FFC rebate is paid out.'],
+  ],
+  two: 'Two incentives',
+  cinaT: 'CINA', cinaS: 'Audiovisual Investment Certificate', cinaB: `A transferable tax credit worth ${inc.cinaRate}% of spend on audiovisual and audiovisual-logistics services contracted in Colombia. It is aimed at foreign producers who do not file income tax in the country, who trade it with Colombian taxpayers.`,
+  cinaL: ['Films, series, music videos and other formats', 'Post-production-only projects too', `2026 quota: ${inc.cinaQuota2026}, the highest to date`],
+  ffcT: 'FFC', ffcS: 'Colombia Film Fund cash rebate', ffcB: `A cash rebate of ${inc.ffcServicesRate}% of spend on audiovisual services and ${inc.ffcLogisticsRate}% of spend on logistics services (hotels, catering and transport).`,
+  ffcL: ['Mainly aimed at cinematographic works', 'Limited annual resources', 'Paid directly to the producer'],
+  mins: 'Minimum spend in Colombia · 2026', minRows: [['Films and series', `${inc.minFilmSmlmv.toLocaleString('en-US')} SMLMV`, fmtCOP(minFilm) + ' ≈ ' + fmtUSD(minFilm / inc.trm)], ['Post-production only (CINA)', `${inc.minPostSmlmv} SMLMV`, fmtCOP(minPost) + ' ≈ ' + fmtUSD(minPost / inc.trm)], ['Music videos (package)', `${inc.minMusicVideoSmlmv.toLocaleString('en-US')} SMLMV`, fmtCOP(inc.minMusicVideoSmlmv * inc.smlmv)]],
+  minNote: 'SMLMV is Colombia’s monthly minimum wage. Series and packages also have a minimum average spend per episode or video. The annual quota can run out before year-end: in 2025 it was exhausted in early September.',
+  cT: 'Calculator', cLede: 'Enter your planned spend in Colombia and we will tell you whether the project meets the minimum and how much it could recover.',
+  type: 'Project type', types: ['Film or series', 'Post-production only', 'Music videos'], cur: 'Currency',
+  sa: 'Audiovisual services spend', saH: 'Crew and cast, equipment, locations, post-production.', sl: 'Logistics services spend', slH: 'Hotels, catering and transport.',
+  trm: 'Exchange rate (COP per USD)', sale: 'CINA sale value (% of face value)', saleH: 'The certificate trades at a discount; the percentage depends on the market.',
+  ok: 'Eligible', no: 'Not yet eligible', total: 'Total spend in Colombia', min: 'Minimum required', cina: 'CINA certificate', cinaNet: 'Estimated when sold', ffc: 'FFC cash rebate', ffcNA: 'Not available on this route',
+  noBody: 'Your project does not reach the incentive’s minimum spend. We can still work together: we can advise you on structuring it, or produce it with you in Colombia.', noCta: 'Explore other ways to work together', okCta: 'Let’s talk about your project', missing: 'Short by',
+  disc: 'Indicative estimate. This is not legal or tax advice. Incentives are subject to approval by the Colombian Film Promotion Committee, quota availability and current regulations.',
+  svc: 'What we do', svcs: [['Production', 'Production and line production in Colombia: crew, locations, permits, logistics and budget, from prep to the last shooting day.'], ['Post-production', 'Editing and color grading with DCI 4K workflows and deliverables for theaters and platforms.'], ['Structuring', 'We help you define the incentive route, the contracting scheme and the right local partners for your project.']],
+  exp: 'Production services experience: Bertha by Laura Asprilla (IDARTES 2023 creation grant; 2024 National Short Film Meeting, 22nd Bogoshorts) and Hyper by Alejandro Garzón (Colombia–Indonesia co-production; In Vitro BFM 2023).',
+  faq: 'Frequently asked questions', faqs: [
+    ['Can I combine CINA and FFC?', 'Not on the same spend. Each project applies to one of the two mechanisms; the calculator shows both so you can compare.'],
+    ['Can a post-production-only project apply?', `Yes, to CINA, if it meets the minimum spend (${fmtCOP(minPost)}) and is submitted as a standalone project.`],
+    ['What if my project does not reach the minimum?', 'It cannot access the incentive, but Colombia remains competitive on cost, talent and locations. We can produce with you or advise you.'],
+    ['Who receives the CINA?', 'The foreign producer. Since they do not file income tax in Colombia, they transfer it to a Colombian taxpayer, who uses it as a credit against income tax.'],
+    ['How long is it in force?', 'The Law 1556 framework is in force until 2032. Quotas and minimums are updated every year.'],
+  ],
+  src: 'Official sources', upd: 'Last updated', end: 'Tell us about your project.',
+};
+---
+<Base lang={lang} title={L.title} description={L.lede} alt={routes[es ? 'en' : 'es'].producers} current="producers" image="/media/los-tres-extranos/frame-01-1600.webp">
+  <section class="phero">
+    <img src={frameSrc('los-tres-extranos', 1, 1600)} srcset={frameSet('los-tres-extranos', 1)} sizes="100vw" alt="" fetchpriority="high" />
+    <div class="wrap in">
+      <p class="label"><b>{L.title}</b></p>
+      <h1>{L.h1a}<br />{L.h1b}</h1>
+      <p class="lede">{L.lede}</p>
+      <div class="cta"><a class="btn" href="#calc">{L.calc} <span class="arr">↓</span></a>{mail && <a class="btn ghost" href={mail}>{L.talk}</a>}</div>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <h2 class="label reveal">{L.how}</h2>
+    <ol class="steps">
+      {L.steps.map(([a, b], i) => <li class="reveal"><span class="n">{String(i + 1).padStart(2, '0')}</span><h3>{a}</h3><p>{b}</p></li>)}
+    </ol>
+  </section>
+
+  <section class="wrap section" style="padding-top:0">
+    <h2 class="label reveal">{L.two}</h2>
+    <div class="two">
+      <article class="reveal"><p class="pct">{inc.cinaRate}<sup>%</sup></p><h3>{L.cinaT}</h3><p class="label"><b>{L.cinaS}</b></p><p>{L.cinaB}</p><ul>{L.cinaL.map((x) => <li>{x}</li>)}</ul></article>
+      <article class="reveal"><p class="pct">{inc.ffcServicesRate}<sup>%</sup><span>+ {inc.ffcLogisticsRate}<sup>%</sup></span></p><h3>{L.ffcT}</h3><p class="label"><b>{L.ffcS}</b></p><p>{L.ffcB}</p><ul>{L.ffcL.map((x) => <li>{x}</li>)}</ul></article>
+    </div>
+    <div class="mins reveal">
+      <h3 class="label">{L.mins}</h3>
+      <table><tbody>{L.minRows.map((r) => <tr><th scope="row">{r[0]}</th><td class="label">{r[1]}</td><td>{r[2]}</td></tr>)}</tbody></table>
+      <p class="small">{L.minNote}</p>
+    </div>
+  </section>
+
+  <section id="calc" class="calc">
+    <div class="wrap grid" data-inc={JSON.stringify(inc)} data-lang={lang}>
+      <form class="reveal" onsubmit="return false">
+        <h2>{L.cT}</h2>
+        <p>{L.cLede}</p>
+        <fieldset><legend class="label">{L.type}</legend>
+          <div class="seg">{L.types.map((x, i) => <label><input type="radio" name="type" value={['film', 'post', 'mv'][i]} checked={i === 0} /><span>{x}</span></label>)}</div>
+        </fieldset>
+        <fieldset><legend class="label">{L.cur}</legend>
+          <div class="seg">{['USD', 'COP'].map((x, i) => <label><input type="radio" name="cur" value={x} checked={(es ? 'COP' : 'USD') === x} /><span>{x}</span></label>)}</div>
+        </fieldset>
+        <label class="f"><span class="label">{L.sa}</span><input type="text" inputmode="numeric" name="sa" autocomplete="off" /><small>{L.saH}</small></label>
+        <label class="f"><span class="label">{L.sl}</span><input type="text" inputmode="numeric" name="sl" autocomplete="off" /><small>{L.slH}</small></label>
+        <div class="pair">
+          <label class="f"><span class="label">{L.trm}</span><input type="text" inputmode="numeric" name="trm" value={inc.trm} autocomplete="off" /></label>
+          <label class="f"><span class="label">{L.sale}</span><input type="number" name="sale" min="50" max="100" step="1" value={inc.cinaSaleRate} /></label>
+        </div>
+        <small>{L.saleH}</small>
+      </form>
+      <div class="out reveal" aria-live="polite">
+        <p class="verdict tag" id="v" data-ok="1" data-oktext={L.ok} data-notext={L.no}>{L.ok}</p>
+        <dl>
+          <div><dt>{L.total}</dt><dd id="o-total">—</dd></div>
+          <div><dt>{L.min}</dt><dd id="o-min">—</dd></div>
+        </dl>
+        <div id="yes">
+          <div class="res"><p class="label">{L.cina} · {inc.cinaRate} %</p><p class="num" id="o-cina">—</p><p class="sub"><span class="label">{L.cinaNet}</span> <b id="o-net">—</b></p></div>
+          <div class="res" id="ffc-box"><p class="label">{L.ffc} · {inc.ffcServicesRate} % + {inc.ffcLogisticsRate} %</p><p class="num" id="o-ffc" data-na={L.ffcNA}>—</p></div>
+          {mail && <a class="btn" href={mail}>{L.okCta} <span class="arr">→</span></a>}
+        </div>
+        <div id="nope" hidden>
+          <p class="miss"><span class="label">{L.missing}</span> <b id="o-miss">—</b></p>
+          <p>{L.noBody}</p>
+          {mail ? <a class="btn" href={mail}>{L.noCta} <span class="arr">→</span></a> : <a class="btn" href="#svc">{L.noCta} <span class="arr">↓</span></a>}
+        </div>
+        <p class="small">{L.disc}</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="svc" class="wrap section">
+    <h2 class="label reveal">{L.svc}</h2>
+    <div class="svc">{L.svcs.map(([a, b]) => <article class="reveal"><h3>{a}</h3><p>{b}</p></article>)}</div>
+    <p class="exp reveal">{L.exp}</p>
+  </section>
+
+  <section class="wrap section faqw" style="padding-top:0">
+    <h2 class="label">{L.faq}</h2>
+    <div>{L.faqs.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}</div>
+  </section>
+
+  <section class="wrap srcs">
+    <div><h2 class="label">{L.src}</h2><ul>{inc.sources.map((s) => <li><a href={s.url} rel="noopener" target="_blank">{s.label} ↗</a></li>)}</ul></div>
+    <p class="label">{L.upd}: <b>{updated}</b></p>
+  </section>
+
+  <section class="wrap end">
+    <p>{L.end}</p>
+    {mail && <a class="btn" href={mail}>{t.write} <span class="arr">→</span></a>}
+  </section>
+</Base>
+<style>
+  .phero { position: relative; min-height: 100svh; display: flex; align-items: flex-end; overflow: hidden; }
+  .phero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .phero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,10,9,1) 0%, rgba(11,10,9,.55) 45%, rgba(11,10,9,.25) 100%); }
+  .phero .in { position: relative; z-index: 1; width: 100%; padding-block: calc(var(--nav-h) + 40px) clamp(36px, 6vw, 80px); }
+  .phero h1 { font-size: clamp(84px, 19vw, 340px); margin: 14px 0 20px; line-height: .84; }
+  .phero .lede { font-size: clamp(19px, 1.7vw, 28px); line-height: 1.32; max-width: 44ch; }
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .steps { list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--line); }
+  .steps li { padding: 22px 22px 8px 0; border-right: 1px solid var(--line); padding-left: 22px; }
+  .steps li:first-child { padding-left: 0; } .steps li:last-child { border-right: 0; }
+  .steps .n { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: .12em; }
+  .steps h3 { font-size: clamp(30px, 2.8vw, 44px); margin: 28px 0 12px; }
+  .steps p { font-size: .95em; color: #cfc8bc; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 1.2vw, 18px); margin-top: 22px; }
+  .two article { border: 1px solid var(--line); padding: clamp(20px, 3vw, 44px); background: var(--bg-2); }
+  .pct { font-family: var(--display); font-size: clamp(110px, 14vw, 240px); line-height: .8; margin: 0 0 18px; display: flex; align-items: baseline; gap: 18px; }
+  .pct sup { font-size: .4em; align-self: flex-start; margin-top: .1em; }
+  .pct span { font-size: .42em; color: var(--muted); display: inline-flex; }
+  .two h3 { font-size: clamp(38px, 4vw, 64px); margin-bottom: 8px; }
+  .two .label { margin-bottom: 16px; }
+  .two ul { list-style: none; padding: 0; margin: 18px 0 0; border-top: 1px solid var(--line); }
+  .two li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .93em; }
+  .mins { margin-top: clamp(28px, 4vw, 56px); }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  th, td { text-align: left; padding: 14px 12px 14px 0; border-top: 1px solid var(--line); font-weight: 400; vertical-align: baseline; }
+  tr:last-child th, tr:last-child td { border-bottom: 1px solid var(--line); }
+  td:last-child { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+  .small, small { font-size: 14px; color: var(--muted); line-height: 1.5; display: block; max-width: 78ch; }
+  .calc { background: var(--ink); color: var(--bg); padding-block: clamp(48px, 7vw, 110px); scroll-margin-top: var(--nav-h); }
+  .calc .grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 96px); align-items: start; }
+  .calc h2 { font-size: clamp(60px, 9vw, 150px); margin-bottom: 16px; }
+  .calc .label, .calc small, .calc .small { color: #5d574d; } .calc .label b { color: var(--bg); }
+  fieldset { border: 0; padding: 0; margin: 22px 0 0; } legend { padding: 0; margin-bottom: 8px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg label { cursor: pointer; }
+  .seg input { position: absolute; opacity: 0; }
+  .seg span { display: inline-flex; align-items: center; min-height: 42px; padding: 0 14px; border: 1px solid rgba(11,10,9,.25); font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+  .seg input:checked + span { background: var(--bg); color: var(--ink); border-color: var(--bg); }
+  .seg input:focus-visible + span { outline: 2px solid var(--bg); outline-offset: 3px; }
+  .f { display: block; margin-top: 22px; }
+  .f input { display: block; width: 100%; margin: 6px 0; background: transparent; border: 0; border-bottom: 2px solid var(--bg); color: var(--bg); font-family: var(--display); font-size: clamp(34px, 3.6vw, 56px); padding: 2px 0; border-radius: 0; font-variant-numeric: tabular-nums; }
+  .f input:focus { outline: none; border-bottom-color: var(--accent); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end; }
+  .pair .f input { font-size: clamp(26px, 2.4vw, 36px); }
+  .out { background: var(--bg); color: var(--ink); padding: clamp(20px, 3vw, 44px); position: sticky; top: calc(var(--nav-h) + 16px); }
+  .out .label { color: var(--muted); } .out .small { color: var(--muted); margin-top: 22px; }
+  .verdict { font-size: 13px; margin: 0 0 18px; padding: 8px 12px; border: 1px solid var(--line); }
+  .verdict[data-ok='1']::before { background: #6fcf8a; box-shadow: 0 0 0 4px rgba(111,207,138,.2); }
+  .verdict[data-ok='0']::before { background: var(--accent); box-shadow: 0 0 0 4px rgba(210,69,47,.22); }
+  .out dl { margin: 0 0 8px; }
+  .out dl div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .out dt { font-family: var(--mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .out dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
+  .res { border-top: 1px solid var(--line); padding: 18px 0; }
+  .res p { margin: 0; }
+  .num { font-family: var(--display); font-size: clamp(44px, 5.4vw, 88px); line-height: 1; margin: 8px 0 !important; font-variant-numeric: tabular-nums; }
+  .num.na { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--muted); }
+  .sub b { font-weight: 500; }
+  .miss { font-size: 1.2em; } #nope p { max-width: 44ch; }
+  .svc { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 3vw, 56px); margin-top: 22px; border-top: 1px solid var(--line); padding-top: 26px; }
+  .svc h3 { font-size: clamp(38px, 4vw, 64px); margin-bottom: 14px; }
+  .exp { margin-top: 36px; font-style: italic; max-width: 70ch; color: #cfc8bc; }
+  .faqw { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
+  details { border-top: 1px solid var(--line); } details:last-child { border-bottom: 1px solid var(--line); }
+  summary { cursor: pointer; list-style: none; padding: 18px 40px 18px 0; position: relative; font-size: clamp(19px, 1.6vw, 26px); }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; position: absolute; right: 4px; top: 14px; font-family: var(--mono); font-size: 22px; color: var(--muted); }
+  details[open] summary::after { content: '–'; }
+  details p { max-width: 60ch; color: #cfc8bc; padding-bottom: 8px; }
+  .srcs { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; border-top: 1px solid var(--line); padding-block: 28px; }
+  .srcs ul { list-style: none; padding: 0; margin: 12px 0 0; font-size: 15px; } .srcs li { padding: 3px 0; } .srcs a:hover { text-decoration: underline; }
+  .end { padding-top: clamp(48px, 8vw, 120px); display: flex; flex-direction: column; gap: 26px; align-items: flex-start; }
+  .end p { font-family: var(--display); text-transform: uppercase; font-size: clamp(56px, 10vw, 180px); line-height: .88; margin: 0; max-width: 12ch; }
+  @media (max-width: 900px) { .steps { grid-template-columns: 1fr 1fr; } .steps li { padding-left: 0 !important; border-right: 0; border-bottom: 1px solid var(--line); padding-right: 16px; } .two, .calc .grid, .svc, .faqw { grid-template-columns: 1fr; } .out { position: static; } }
+  @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } td.label { display: none; } }
+</style>
+<script>
+  const root = document.querySelector<HTMLElement>('.calc .grid')!;
+  const inc = JSON.parse(root.dataset.inc!); const loc = root.dataset.lang === 'es' ? 'es-CO' : 'en-US';
+  const form = root.querySelector('form')!; const $ = (id: string) => document.getElementById(id)!;
+  const nf = new Intl.NumberFormat(loc, { maximumFractionDigits: 0 });
+  const parse = (s: string) => Number(String(s).replace(/[^\d]/g, '')) || 0;
+  const val = (n: string) => (form.elements.namedItem(n) as any).value as string;
+  const money = (cop: number, cur: string, trm: number) => cur === 'USD' ? 'USD ' + nf.format(cop / trm) : 'COP ' + nf.format(cop);
+  const defaults: Record<string, [number, number]> = { film: [4200000000, 800000000], post: [900000000, 0], mv: [2800000000, 500000000] };
+  let touched = false; let lastCur = val('cur');
+  const seed = () => { const [a, b] = defaults[val('type')]; const cur = val('cur'); const trm = parse(val('trm')) || inc.trm; const k = cur === 'USD' ? 1 / trm : 1; (form.elements.namedItem('sa') as HTMLInputElement).value = nf.format(Math.round(a * k / 1000) * 1000); (form.elements.namedItem('sl') as HTMLInputElement).value = nf.format(Math.round(b * k / 1000) * 1000); };
+  const calc = () => {
+    const type = val('type'), cur = val('cur'); const trm = parse(val('trm')) || inc.trm; const k = cur === 'USD' ? trm : 1;
+    const sa = parse(val('sa')) * k, sl = parse(val('sl')) * k, total = sa + sl;
+    const minS = type === 'post' ? inc.minPostSmlmv : type === 'mv' ? inc.minMusicVideoSmlmv : inc.minFilmSmlmv; const min = minS * inc.smlmv;
+    const sale = Math.min(100, Math.max(0, Number(val('sale')) || 0)) / 100;
+    const ok = total >= min; const cina = total * inc.cinaRate / 100; const ffc = sa * inc.ffcServicesRate / 100 + sl * inc.ffcLogisticsRate / 100;
+    const v = $('v'); v.dataset.ok = ok ? '1' : '0'; v.textContent = ok ? v.dataset.oktext! : v.dataset.notext!;
+    $('o-total').textContent = money(total, cur, trm); $('o-min').textContent = money(min, cur, trm);
+    $('yes').hidden = !ok; $('nope').hidden = ok;
+    $('o-cina').textContent = money(cina, cur, trm); $('o-net').textContent = money(cina * sale, cur, trm);
+    const f = $('o-ffc'); const ffcOk = type === 'film'; f.textContent = ffcOk ? money(ffc, cur, trm) : f.dataset.na!; f.classList.toggle('na', !ffcOk);
+    $('o-miss').textContent = money(Math.max(0, min - total), cur, trm);
+  };
+  form.addEventListener('input', (e) => {
+    const el = e.target as HTMLInputElement;
+    if (el.name === 'sa' || el.name === 'sl') { touched = true; const n = parse(el.value); el.value = n ? nf.format(n) : ''; }
+    if (el.name === 'type' && !touched) seed();
+    if (el.name === 'cur') { const trm = parse(val('trm')) || inc.trm; if (touched && el.value !== lastCur) { ['sa', 'sl'].forEach((n) => { const i = form.elements.namedItem(n) as HTMLInputElement; const x = parse(i.value); i.value = nf.format(Math.round(el.value === 'USD' ? x / trm : x * trm)); }); } else seed(); lastCur = el.value; }
+    calc();
+  });
+  seed(); calc();
+</script>

@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import products from '../data/products.json';
+import { routes, settings, mailto, type Lang } from '../lib/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props; const es = lang === 'es';
+const L = es
+  ? { title: 'Tienda', lede: 'Merch de EL CAMINO CINE en tiradas cortas. Cada drop se produce una sola vez.', next: 'Próximo drop', open: 'Drop abierto', soon: 'Próximamente', buy: 'Comprar', wl: 'Lista de espera', wlBody: 'Déjanos tu correo y te avisamos primero cuando abra el próximo drop.', email: 'Tu correo electrónico', join: 'Quiero enterarme', ok: 'Listo. Te avisaremos.', err: 'No pudimos registrar tu correo. Inténtalo de nuevo.', ship: 'Envíos a toda Colombia.', subj: 'Lista de espera — Tienda EL CAMINO CINE' }
+  : { title: 'Shop', lede: 'EL CAMINO CINE merch in short runs. Each drop is produced only once.', next: 'Next drop', open: 'Drop open', soon: 'Coming soon', buy: 'Buy', wl: 'Waitlist', wlBody: 'Leave your email and you will be the first to know when the next drop opens.', email: 'Your email address', join: 'Keep me posted', ok: 'Done. We will let you know.', err: 'We could not save your email. Please try again.', ship: 'Shipping across Colombia.', subj: 'Waitlist — EL CAMINO CINE shop' };
+const mail = mailto(L.subj);
+---
+<Base lang={lang} title={L.title} description={L.lede} alt={routes[es ? 'en' : 'es'].shop} current="shop" solidHead>
+  <div class="wrap page-head">
+    <p class="tag" data-status={products.dropOpen ? 'estreno' : ''}>{products.dropOpen ? L.open : L.next}</p>
+    <h1 style="margin-top:14px">{L.title}</h1>
+    <p class="lede">{L.lede}</p>
+  </div>
+  <div class="wrap grid">
+    {products.items.map((p, i) => (
+      <article class="p reveal">
+        <div class="ph">
+          {p.image ? <img src={p.image} alt="" loading="lazy" /> : <img class="iso" src="/icons/isotipo-white.png" alt="" loading="lazy" />}
+          <span class="label n">{String(i + 1).padStart(2, '0')}</span>
+        </div>
+        <div class="row2">
+          <div><h2>{p[lang]}</h2><p>{es ? p.noteEs : p.noteEn}</p></div>
+          {products.dropOpen && p.payLink
+            ? <a class="btn" href={p.payLink} rel="noopener" target="_blank">{L.buy}{p.price && ` · ${p.price}`}</a>
+            : <span class="label"><b>{p.price || L.soon}</b></span>}
+        </div>
+      </article>
+    ))}
+  </div>
+  <section class="wrap wl">
+    <div><h2>{L.wl}</h2><p>{L.wlBody}</p><p class="label">{L.ship}</p></div>
+    {settings.waitlistEndpoint ? (
+      <form data-endpoint={settings.waitlistEndpoint} data-ok={L.ok} data-err={L.err}>
+        <label><span class="label">{L.email}</span><input type="email" name="email" required autocomplete="email" placeholder="nombre@correo.com" /></label>
+        <button class="btn" type="submit">{L.join} <span class="arr">→</span></button>
+        <p class="msg label" role="status"></p>
+      </form>
+    ) : mail ? <a class="btn" href={mail}>{L.join} <span class="arr">→</span></a> : <span class="btn" aria-disabled="true">{L.soon}</span>}
+  </section>
+</Base>
+<style>
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(10px, 1.2vw, 18px); }
+  .ph { position: relative; aspect-ratio: 4 / 5; background: radial-gradient(120% 90% at 30% 0%, #26221d 0%, #100e0d 65%); overflow: hidden; display: grid; place-items: center; }
+  .ph img { width: 100%; height: 100%; object-fit: cover; }
+  .ph img.iso { width: 34%; height: auto; object-fit: contain; opacity: .9; }
+  .ph .n { position: absolute; top: 14px; left: 14px; }
+  .row2 { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; align-items: flex-start; }
+  .p h2 { font-size: clamp(28px, 2.6vw, 40px); margin-bottom: 6px; }
+  .p p { margin: 0; font-size: .92em; color: #cfc8bc; }
+  .wl { margin-top: clamp(56px, 8vw, 120px); border-top: 1px solid var(--line); padding-top: clamp(32px, 5vw, 64px); display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(24px, 5vw, 96px); align-items: end; }
+  .wl h2 { font-size: clamp(60px, 9vw, 150px); margin-bottom: 14px; }
+  .wl p { max-width: 42ch; }
+  .wl form { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+  .wl label { width: 100%; }
+  .wl input { display: block; width: 100%; background: transparent; border: 0; border-bottom: 2px solid var(--ink); color: var(--ink); font-family: var(--serif); font-size: clamp(22px, 2.2vw, 32px); padding: 8px 0; margin-top: 6px; border-radius: 0; }
+  .wl input:focus { outline: none; border-bottom-color: var(--accent); }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr 1fr; } .wl { grid-template-columns: 1fr; } }
+</style>
+<script>
+  const f = document.querySelector<HTMLFormElement>('.wl form');
+  f?.addEventListener('submit', async (e) => {
+    e.preventDefault(); const msg = f.querySelector('.msg')!;
+    try { const r = await fetch(f.dataset.endpoint!, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(f) }); if (!r.ok) throw 0; msg.textContent = f.dataset.ok!; f.reset(); }
+    catch { msg.textContent = f.dataset.err!; }
+  });
+</script>

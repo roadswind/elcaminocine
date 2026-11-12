@@ -1,0 +1,44 @@
+{
+  "slug": "las-horas-ultimas",
+  "order": 2,
+  "title": "Las horas últimas",
+  "format": "cortometraje",
+  "kind": "ficcion",
+  "status": "desarrollo",
+  "year": "",
+  "runtime": "12 min (est.)",
+  "frames": 5,
+  "focus": "50% 50%",
+  "poster": false,
+  "bts": 0,
+  "clip": "",
+  "trailerVimeoId": "",
+  "filmVimeoId": "",
+  "watch": "none",
+  "es": {
+    "tagline": "Existimos en el tiempo, vivimos para amar y luego, la muerte.",
+    "logline": "En un mundo al borde del colapso, Manuel decide vivir sus horas últimas una a la vez. Entre el amor y la devastación, el tiempo corre en una cuenta regresiva implacable.",
+    "synopsis": "En las montañas de un pueblo remoto, Manuel, un joven geólogo, ha descubierto un fenómeno inquietante: la tierra misma parece estar colapsando bajo una amenaza irreversible. Sus estudios indican que todo está a punto de terminar. Tras compartir su hallazgo con otros científicos, el mundo sigue su curso indiferente. Sin más que hacer, Manuel decide vivir sus horas últimas de la única forma que aún tiene sentido: junto a Valentina, una mujer cuya intensidad lo arrastra hacia una despedida llena de deseo, preguntas sin respuesta y la extraña belleza de lo efímero. Mientras el desastre avanza sin tregua, la noche se convierte en un refugio frágil, donde el amor y la incertidumbre chocan contra lo inevitable.",
+    "genre": "Ciencia ficción",
+    "note": "",
+    "noteBy": ""
+  },
+  "en": {
+    "tagline": "We exist in time, we live to love and then, death.",
+    "logline": "In a world on the verge of collapse, Manuel decides to live his last hours one at a time. Between love and devastation, time runs in a relentless countdown.",
+    "synopsis": "In the mountains of a remote town, Manuel, a young geologist, has discovered an unsettling phenomenon: the earth itself seems to be collapsing under an irreversible threat. His studies show everything is about to end. After he shares his findings with other scientists, the world carries on, indifferent. With nothing left to do, Manuel decides to live his last hours the only way that still makes sense: beside Valentina, a woman whose intensity pulls him into a farewell full of desire, unanswered questions and the strange beauty of the ephemeral. As the disaster advances without pause, the night becomes a fragile refuge where love and uncertainty collide with the inevitable.",
+    "genre": "Science fiction",
+    "note": "",
+    "noteBy": ""
+  },
+  "credits": [
+    { "es": "Dirección", "en": "Directed by", "name": "David Rodríguez" },
+    { "es": "Producción", "en": "Produced by", "name": "David Rodríguez" }
+  ],
+  "specs": [
+    { "es": "Formato de rodaje", "en": "Shooting format", "value": "DCI 4K" },
+    { "es": "Formato de finalización", "en": "Finishing format", "value": "DCP" },
+    { "es": "Idioma", "en": "Language", "value": "Español" }
+  ],
+  "press": []
+}

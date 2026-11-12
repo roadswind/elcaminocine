@@ -1,0 +1,39 @@
+{
+  "slug": "los-tres-extranos",
+  "order": 3,
+  "title": "Los tres extraños",
+  "format": "cortometraje",
+  "kind": "ficcion",
+  "status": "desarrollo",
+  "year": "",
+  "runtime": "",
+  "frames": 5,
+  "focus": "50% 45%",
+  "poster": false,
+  "bts": 0,
+  "clip": "",
+  "trailerVimeoId": "",
+  "filmVimeoId": "",
+  "watch": "none",
+  "es": {
+    "tagline": "",
+    "logline": "Un cortometraje sobre la violencia, la guerra abierta e interna del hombre y la crueldad de la época de la conquista.",
+    "synopsis": "",
+    "genre": "Ficción",
+    "note": "",
+    "noteBy": ""
+  },
+  "en": {
+    "tagline": "",
+    "logline": "A short film about violence, man’s open and inner wars, and the cruelty of the age of the conquest.",
+    "synopsis": "",
+    "genre": "Fiction",
+    "note": "",
+    "noteBy": ""
+  },
+  "credits": [
+    { "es": "Guion y dirección", "en": "Written and directed by", "name": "David Rodríguez" }
+  ],
+  "specs": [],
+  "press": []
+}

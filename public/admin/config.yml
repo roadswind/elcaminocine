@@ -1,0 +1,125 @@
+# Panel de contenido de EL CAMINO CINE (Sveltia CMS). Entra en /admin/ con tu cuenta de GitHub
+# usando "Sign in with token" (token personal con permiso sobre este repositorio).
+backend:
+  name: github
+  repo: roadswind/elcaminocine
+  branch: main
+media_folder: public/media/uploads
+public_folder: /media/uploads
+locale: es
+collections:
+  - name: films
+    label: Películas y series
+    label_singular: Proyecto
+    folder: src/content/films
+    extension: json
+    format: json
+    create: true
+    slug: '{{fields.slug}}'
+    summary: '{{title}} — {{status}}'
+    fields:
+      - { name: slug, label: Identificador (URL), hint: 'minúsculas y guiones, p. ej. mi-pelicula' }
+      - { name: order, label: Orden, widget: number, value_type: int }
+      - { name: title, label: Título }
+      - { name: titleImage, label: Título como imagen (PNG blanco transparente), widget: image, required: false }
+      - { name: format, label: Formato, widget: select, options: [largometraje, cortometraje, serie] }
+      - { name: kind, label: Tipo, widget: select, options: [ficcion, documental] }
+      - { name: status, label: Estado, widget: select, options: [estreno, disponible, postproduccion, produccion, desarrollo] }
+      - { name: year, label: Año, required: false }
+      - { name: runtime, label: Duración, required: false }
+      - { name: frames, label: 'Número de frames (archivos frame-01…)', widget: number, value_type: int, default: 0 }
+      - { name: focus, label: 'Punto focal (p. ej. 50% 35%)', default: '50% 50%' }
+      - { name: poster, label: Tiene póster, widget: boolean, default: false }
+      - { name: bts, label: Fotos de detrás de cámaras, widget: number, value_type: int, default: 0 }
+      - { name: clip, label: 'Clip para hover (.mp4 liviano)', widget: file, required: false }
+      - { name: trailerVimeoId, label: ID de Vimeo del tráiler, required: false }
+      - { name: filmVimeoId, label: ID de Vimeo de la película, required: false }
+      - { name: watch, label: En la Sala, widget: select, options: [{ label: No aparece, value: none }, { label: Próximamente, value: soon }, { label: Se puede ver, value: public }] }
+      - &texts
+        name: es
+        label: Textos en español
+        widget: object
+        fields:
+          - { name: tagline, label: Tagline, required: false }
+          - { name: logline, label: Logline, widget: text, required: false }
+          - { name: synopsis, label: Sinopsis, widget: text, required: false }
+          - { name: genre, label: Género, required: false }
+          - { name: note, label: Nota del productor, widget: text, required: false }
+          - { name: noteBy, label: Firma de la nota, required: false }
+      - { <<: *texts, name: en, label: Textos en inglés }
+      - name: credits
+        label: Créditos
+        widget: list
+        fields: [{ name: es, label: Cargo (ES) }, { name: en, label: Cargo (EN) }, { name: name, label: Nombre }]
+      - name: specs
+        label: Ficha técnica
+        widget: list
+        fields: [{ name: es, label: Dato (ES) }, { name: en, label: Dato (EN) }, { name: value, label: Valor }]
+      - name: press
+        label: Descargables de prensa
+        widget: list
+        fields: [{ name: es, label: Nombre (ES) }, { name: en, label: Nombre (EN) }, { name: file, label: Archivo, widget: file }]
+  - name: site
+    label: Sitio
+    files:
+      - name: settings
+        label: Contacto e incentivos
+        file: src/data/settings.json
+        fields:
+          - { name: email, label: Correo de contacto, required: false }
+          - { name: instagram, label: Enlace de Instagram, required: false }
+          - { name: vimeo, label: Enlace de Vimeo, required: false }
+          - { name: reelVimeoId, label: ID de Vimeo del reel, required: false }
+          - { name: waitlistEndpoint, label: 'URL del formulario de lista de espera (p. ej. Formspree)', required: false }
+          - name: incentives
+            label: Incentivos (cifras de la calculadora)
+            widget: object
+            fields:
+              - { name: updated, label: Fecha de actualización (AAAA-MM-DD) }
+              - { name: smlmv, label: Salario mínimo mensual (COP), widget: number, value_type: int }
+              - { name: trm, label: Tasa de cambio por defecto, widget: number, value_type: int }
+              - { name: cinaRate, label: 'CINA %', widget: number, value_type: float }
+              - { name: cinaSaleRate, label: 'Valor de venta del CINA %', widget: number, value_type: float }
+              - { name: ffcServicesRate, label: 'FFC servicios audiovisuales %', widget: number, value_type: float }
+              - { name: ffcLogisticsRate, label: 'FFC servicios logísticos %', widget: number, value_type: float }
+              - { name: minFilmSmlmv, label: Mínimo películas y series (SMLMV), widget: number, value_type: int }
+              - { name: minPostSmlmv, label: Mínimo solo postproducción (SMLMV), widget: number, value_type: int }
+              - { name: minMusicVideoSmlmv, label: Mínimo videos musicales (SMLMV), widget: number, value_type: int }
+              - { name: cinaQuota2026, label: Cupo CINA del año }
+              - name: sources
+                label: Fuentes
+                widget: list
+                fields: [{ name: label, label: Nombre }, { name: url, label: Enlace }]
+      - name: products
+        label: Tienda
+        file: src/data/products.json
+        fields:
+          - { name: dropOpen, label: Drop abierto, widget: boolean }
+          - name: items
+            label: Productos
+            widget: list
+            fields:
+              - { name: id, label: Identificador }
+              - { name: es, label: Nombre (ES) }
+              - { name: en, label: Nombre (EN) }
+              - { name: noteEs, label: Descripción (ES), required: false }
+              - { name: noteEn, label: Descripción (EN), required: false }
+              - { name: price, label: Precio, required: false }
+              - { name: payLink, label: Link de pago, required: false }
+              - { name: image, label: Foto, widget: image, required: false }
+      - name: team
+        label: Nosotros
+        file: src/data/team.json
+        fields:
+          - { name: manifestoEs, label: Manifiesto (ES), widget: list, field: { name: p, label: Párrafo, widget: text } }
+          - { name: manifestoEn, label: Manifiesto (EN), widget: list, field: { name: p, label: Párrafo, widget: text } }
+          - name: members
+            label: Equipo
+            widget: list
+            fields:
+              - { name: name, label: Nombre }
+              - { name: roleEs, label: Cargo (ES) }
+              - { name: roleEn, label: Cargo (EN) }
+              - { name: photo, label: Foto (4:5), widget: image, required: false }
+              - { name: bioEs, label: Bio (ES), widget: text }
+              - { name: bioEn, label: Bio (EN), widget: text }
