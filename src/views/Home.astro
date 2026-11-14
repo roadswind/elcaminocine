@@ -88,7 +88,7 @@ const L = lang === 'es'
   @keyframes drift { from { transform: scale(1.09); } to { transform: scale(1.02); } }
   .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,10,9,.94) 0%, rgba(11,10,9,.42) 34%, rgba(11,10,9,0) 62%), linear-gradient(to right, rgba(11,10,9,.5), rgba(11,10,9,0) 55%); }
   .copy { position: absolute; inset: auto 0 0 0; padding-bottom: clamp(108px, 15vh, 160px); }
-  .copy h2 { font-size: clamp(68px, 13.5vw, 230px); margin: 14px 0 10px; max-width: 12ch; }
+  .copy h2 { font-size: clamp(39px, 6.8vw, 115px); margin: 14px 0 10px; max-width: 17ch; }
   .copy h2.has-img { max-width: none; }
   .copy h2.has-img img { width: min(78vw, 820px); height: auto; margin-left: -1%; }
   .copy .tl { font-size: clamp(19px, 1.9vw, 30px); margin-bottom: 26px; max-width: 30ch; line-height: 1.25; }
@@ -96,7 +96,7 @@ const L = lang === 'es'
   .slide.on .copy > * { opacity: 1; transform: none; transition: opacity .9s ease .35s, transform .9s cubic-bezier(.2,.7,.2,1) .35s; }
   .slide.on .copy > *:nth-child(2) { transition-delay: .45s; } .slide.on .copy > *:nth-child(3) { transition-delay: .55s; } .slide.on .copy > *:nth-child(4) { transition-delay: .65s; }
   .ticks { position: absolute; z-index: 3; inset: auto 0 0 0; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 12px; padding-bottom: clamp(18px, 3vh, 34px); }
-  .ticks button { all: unset; cursor: pointer; display: block; padding-top: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); min-width: 0; }
+  .ticks button { all: unset; cursor: pointer; display: block; padding-top: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); min-width: 0; }
   .ticks button:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
   .ticks .bar { display: block; height: 2px; background: rgba(236,231,222,.25); margin-bottom: 10px; overflow: hidden; }
   .ticks .bar i { display: block; height: 100%; width: 0; background: var(--ink); }
@@ -112,16 +112,16 @@ const L = lang === 'es'
   .feature img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .feature .band::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(11,10,9,.78), rgba(11,10,9,.05) 70%); }
   .feature .q { position: absolute; z-index: 1; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
-  .feature blockquote { margin: 0; font-style: italic; font-size: clamp(22px, 3vw, 48px); line-height: 1.15; max-width: 22ch; }
+  .feature blockquote { margin: 0; font-family: var(--serif); font-style: italic; font-size: clamp(22px, 3vw, 48px); line-height: 1.15; max-width: 22ch; }
 
   .prod { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(24px, 5vw, 90px); align-items: end; padding-block: clamp(48px, 7vw, 110px); border-top: 1px solid var(--line); }
-  .prod h2 { font-size: clamp(64px, 11vw, 190px); margin-top: 14px; }
-  .prod .big-n { font-family: var(--display); font-size: clamp(90px, 12vw, 200px); line-height: .8; margin: 0 0 18px; color: var(--accent); }
+  .prod h2 { font-size: clamp(37px, 5.5vw, 95px); margin-top: 14px; }
+  .prod .big-n { font-family: var(--display); font-size: clamp(52px, 6.0vw, 100px); line-height: 1.02; margin: 0 0 18px; color: var(--accent); }
   .prod .big-n sup { font-size: .45em; vertical-align: top; }
   .prod p { max-width: 40ch; }
   @media (max-width: 800px) { .prod { grid-template-columns: 1fr; } }
   .mani { border-top: 1px solid var(--line); padding-block: clamp(56px, 9vw, 140px) 0; display: flex; flex-direction: column; gap: 28px; align-items: flex-start; }
-  .mani p { font-style: italic; font-size: clamp(30px, 5.4vw, 92px); line-height: 1.04; max-width: 16ch; margin: 0; letter-spacing: -.01em; }
+  .mani p { font-family: var(--serif); font-style: italic; font-size: clamp(30px, 5.4vw, 92px); line-height: 1.04; max-width: 16ch; margin: 0; letter-spacing: -.01em; }
 </style>
 
 <script>

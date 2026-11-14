@@ -9,7 +9,7 @@ export const films: any[] = Object.values(modules)
 
 export const routes = {
   es: { home: '/', films: '/peliculas/', watch: '/sala/', shop: '/tienda/', producers: '/productores/', about: '/nosotros/', press: 'prensa' },
-  en: { home: '/en/', films: '/en/films/', watch: '/en/screening-room/', shop: '/en/shop/', producers: '/en/producers/', about: '/en/about/', press: 'press' },
+  en: { home: '/en/', films: '/en/films/', watch: '/sala/?lang=en', shop: '/en/shop/', producers: '/en/producers/', about: '/en/about/', press: 'press' },
 } as const;
 
 export const filmPath = (lang: Lang, slug: string) => `${routes[lang].films}${slug}/`;

@@ -1,4 +1,311 @@
 ---
-import V from '../views/Watch.astro';
+// SALA — app independiente de EL CAMINO CINE (se instala aparte del sitio, con su propio manifest y service worker).
+import '@fontsource-variable/instrument-sans';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import Isotipo from '../components/Isotipo.astro';
+import { films, settings, filmPath } from '../lib/site';
+
+const pick = (c: any) => ({ tagline: c.tagline || '', logline: c.logline || '', synopsis: c.synopsis || '', genre: c.genre || '' });
+const data = {
+  email: settings.email || '',
+  films: films.map((f) => ({
+    slug: f.slug, title: f.title, titleImage: f.titleImage || '', format: f.format, kind: f.kind, status: f.status,
+    year: f.year || '', runtime: f.runtime || '', frames: f.frames || 0, focus: f.focus || '50% 50%',
+    watch: f.watch || 'none', trailer: f.trailerVimeoId || '', film: f.filmVimeoId || '',
+    es: pick(f.es), en: pick(f.en),
+    credits: (f.credits || []).slice(0, 5),
+    url: { es: filmPath('es', f.slug), en: filmPath('en', f.slug) },
+  })),
+};
+const json = JSON.stringify(data).replace(/</g, '\\u003c');
+const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href;
 ---
-<V lang="es" />
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Sala — EL CAMINO CINE</title>
+    <meta name="description" content="La sala de EL CAMINO CINE: una app para ver nuestras películas y series. Se instala en el teléfono o el computador, sin tiendas de apps." />
+    <link rel="canonical" href={new URL('/sala/', Astro.site).href} />
+    <meta property="og:title" content="Sala — EL CAMINO CINE" />
+    <meta property="og:image" content={og} />
+    <meta name="theme-color" content="#0b0a09" />
+    <link rel="manifest" href="/sala/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Sala" />
+    <link rel="apple-touch-icon" href="/icons/icon-180.png" />
+    <link rel="icon" type="image/png" href="/favicon-light.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" href="/favicon-dark.png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="top" id="top">
+        <a class="mark" href="#" id="home" aria-label="Sala — EL CAMINO CINE"><Isotipo /><span>Sala</span></a>
+        <div class="tools">
+          <button type="button" class="pill" id="install" hidden></button>
+          <button type="button" class="pill quiet" id="lang" aria-label="Idioma / Language"></button>
+        </div>
+      </header>
+      <main id="main">
+        <section class="hero" id="hero" aria-live="off"></section>
+        <div id="rows"></div>
+        <footer class="foot"><a id="site" href="/" target="_blank" rel="noopener"></a><span>© EL CAMINO CINE</span></footer>
+      </main>
+    </div>
+
+    <div class="sheet" id="detail" role="dialog" aria-modal="true" aria-labelledby="d-title" hidden>
+      <div class="scrim" data-close></div>
+      <div class="panel" id="panel" tabindex="-1"></div>
+    </div>
+    <div class="theater" id="theater" role="dialog" aria-modal="true" hidden>
+      <button type="button" class="back" id="t-close"></button>
+      <div class="screen" id="screen"></div>
+    </div>
+    <div class="sheet help" id="help" role="dialog" aria-modal="true" aria-labelledby="h-title" hidden>
+      <div class="scrim" data-close></div>
+      <div class="panel small" id="help-panel" tabindex="-1"></div>
+    </div>
+    <noscript><p style="padding:24px;color:#ece7de;font-family:sans-serif">La Sala necesita JavaScript. Visita <a href="/peliculas/" style="color:inherit">elcaminocine.com/peliculas</a>.</p></noscript>
+
+    <script type="application/json" id="sala-data" set:html={json}></script>
+    <script is:inline>
+      (function () {
+        var D = JSON.parse(document.getElementById('sala-data').textContent);
+        var T = {
+          es: { now: 'Ver ahora', soon: 'Próximos estrenos', dev: 'En desarrollo', play: 'Ver', trailer: 'Tráiler', info: 'Más información', notify: 'Avísame del estreno', notifyShort: 'Avísame',
+            st: { estreno: 'Próximo estreno', disponible: 'Disponible', desarrollo: 'En desarrollo', produccion: 'En producción', postproduccion: 'En postproducción' },
+            fmt: { largometraje: 'Largometraje', cortometraje: 'Cortometraje', serie: 'Serie' }, soonBody: 'Más detalles próximamente.',
+            full: 'Ficha completa en el sitio', back: 'Volver', close: 'Cerrar', install: 'Instalar app', site: 'elcaminocine.com', langBtn: 'EN',
+            hTitle: 'Instala la Sala', hLead: 'Queda en tu pantalla de inicio como cualquier app. Sin tienda, gratis y ocupa casi nada.',
+            ios: ['Toca el botón Compartir de tu navegador.', 'Elige «Añadir a pantalla de inicio».', 'Toca «Añadir». Listo.'],
+            android: ['Abre el menú ⋮ de tu navegador.', 'Elige «Instalar app» o «Añadir a pantalla de inicio».', 'Confirma. Listo.'],
+            desktop: ['En Chrome o Edge: toca el ícono de instalar en la barra de direcciones.', 'En Safari (Mac): Archivo → «Añadir al Dock».'], ok: 'Entendido' },
+          en: { now: 'Watch now', soon: 'Coming soon', dev: 'In development', play: 'Watch', trailer: 'Trailer', info: 'More info', notify: 'Notify me at release', notifyShort: 'Notify me',
+            st: { estreno: 'Premiering soon', disponible: 'Available', desarrollo: 'In development', produccion: 'In production', postproduccion: 'In post-production' },
+            fmt: { largometraje: 'Feature film', cortometraje: 'Short film', serie: 'Series' }, soonBody: 'More details coming soon.',
+            full: 'Full film page on the website', back: 'Back', close: 'Close', install: 'Install app', site: 'elcaminocine.com', langBtn: 'ES',
+            hTitle: 'Install the Sala', hLead: 'It sits on your home screen like any app. No store, free, and it takes almost no space.',
+            ios: ['Tap your browser’s Share button.', 'Choose “Add to Home Screen”.', 'Tap “Add”. Done.'],
+            android: ['Open your browser’s ⋮ menu.', 'Choose “Install app” or “Add to Home screen”.', 'Confirm. Done.'],
+            desktop: ['In Chrome or Edge: click the install icon in the address bar.', 'In Safari (Mac): File → “Add to Dock”.'], ok: 'Got it' },
+        };
+        var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+        var q = new URLSearchParams(location.search).get('lang');
+        var lang = (q === 'es' || q === 'en') ? q : (store.get('sala-lang') || ((navigator.language || 'es').toLowerCase().indexOf('es') === 0 ? 'es' : 'en'));
+        if (q) store.set('sala-lang', lang);
+        var $ = function (id) { return document.getElementById(id); };
+        var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+        var frame = function (f, n, w) { return '/media/' + f.slug + '/frame-' + ('0' + n).slice(-2) + '-' + w + '.webp'; };
+        var srcset = function (f, n) { return [800, 1600, 2560].map(function (w) { return frame(f, n, w) + ' ' + w + 'w'; }).join(', '); };
+        var canPlay = function (f) { return f.watch === 'public' && !!f.film; };
+        var bySlug = function (s) { return D.films.filter(function (f) { return f.slug === s; })[0]; };
+        var meta = function (f, t) { return [t.fmt[f.format], f[lang].genre, f.runtime, f.year].filter(Boolean).map(esc).join(' <i>·</i> '); };
+        var mail = function (f, t) { return D.email ? 'mailto:' + D.email + '?subject=' + encodeURIComponent(f.title + ' — ' + t.notify) : ''; };
+        var ICON = { play: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg>', x: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>', back: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M14.5 5l-7 7 7 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' };
+
+        function actions(f, t, where) {
+          var h = '';
+          if (canPlay(f)) h += '<a class="btn solid" href="#' + f.slug + '/film">' + ICON.play + esc(t.play) + '</a>';
+          if (f.trailer) h += '<a class="btn' + (canPlay(f) ? '' : ' solid') + '" href="#' + f.slug + '/trailer">' + (canPlay(f) ? '' : ICON.play) + esc(t.trailer) + '</a>';
+          if (!canPlay(f) && mail(f, t)) h += '<a class="btn' + (f.trailer ? '' : ' solid') + '" href="' + esc(mail(f, t)) + '">' + esc(where === 'hero' ? t.notifyShort : t.notify) + '</a>';
+          if (where === 'hero') h += '<a class="btn" href="#' + f.slug + '">' + esc(t.info) + '</a>';
+          return h;
+        }
+        function card(f, t) {
+          var art = f.frames ? '<img src="' + frame(f, 1, 800) + '" alt="" loading="lazy" decoding="async" style="object-position:' + esc(f.focus) + '">' : '<span class="ghost" aria-hidden="true">' + esc(f.title) + '</span>';
+          return '<a class="card' + (f.frames ? '' : ' bare') + '" href="#' + f.slug + '">' + art + '<span class="ct"><b>' + esc(f.title) + '</b><small>' + esc(t.fmt[f.format]) + (f.runtime ? ' · ' + esc(f.runtime) : '') + '</small></span></a>';
+        }
+        function render() {
+          var t = T[lang]; document.documentElement.lang = lang;
+          var now = D.films.filter(canPlay);
+          var soon = D.films.filter(function (f) { return !canPlay(f) && (f.watch !== 'none' || f.status === 'estreno' || f.status === 'disponible'); });
+          var dev = D.films.filter(function (f) { return now.indexOf(f) < 0 && soon.indexOf(f) < 0; });
+          var feat = now[0] || soon[0] || D.films[0];
+          if (feat) {
+            $('hero').innerHTML = (feat.frames ? '<img class="bg" src="' + frame(feat, 1, 1600) + '" srcset="' + srcset(feat, 1) + '" sizes="100vw" alt="" fetchpriority="high" style="object-position:' + esc(feat.focus) + '">' : '') +
+              '<div class="hc"><p class="tag' + (canPlay(feat) ? ' on' : '') + '">' + esc(canPlay(feat) ? t.now : t.st[feat.status]) + '</p>' +
+              (feat.titleImage ? '<h1 class="ti"><img src="' + esc(feat.titleImage) + '" alt="' + esc(feat.title) + '"></h1>' : '<h1>' + esc(feat.title) + '</h1>') +
+              '<p class="meta">' + meta(feat, t) + '</p>' + (feat[lang].logline ? '<p class="log">' + esc(feat[lang].logline) + '</p>' : '') +
+              '<div class="acts">' + actions(feat, t, 'hero') + '</div></div>';
+          }
+          var rows = [[t.now, now], [t.soon, soon], [t.dev, dev]].filter(function (r) { return r[1].length; });
+          $('rows').innerHTML = rows.map(function (r) { return '<section class="rowx"><h2>' + esc(r[0]) + '</h2><div class="strip">' + r[1].map(function (f) { return card(f, t); }).join('') + '</div></section>'; }).join('');
+          $('lang').textContent = t.langBtn; $('install').textContent = t.install; $('site').textContent = t.site + ' ↗'; $('site').href = lang === 'es' ? '/' : '/en/';
+          $('t-close').innerHTML = ICON.back + '<span>' + esc(t.back) + '</span>';
+        }
+        function detail(f) {
+          var t = T[lang]; var c = f[lang];
+          var body = c.synopsis || c.logline;
+          $('panel').innerHTML = '<button type="button" class="x" data-close aria-label="' + esc(t.close) + '">' + ICON.x + '</button>' +
+            '<div class="dh' + (f.frames ? '' : ' bare') + '">' + (f.frames ? '<img src="' + frame(f, f.frames > 1 ? 2 : 1, 1600) + '" srcset="' + srcset(f, f.frames > 1 ? 2 : 1) + '" sizes="(max-width: 900px) 100vw, 900px" alt="" style="object-position:' + esc(f.focus) + '">' : '') + '</div>' +
+            '<div class="db"><p class="tag' + (canPlay(f) ? ' on' : '') + '">' + esc(canPlay(f) ? t.st.disponible : t.st[f.status]) + '</p><h2 id="d-title">' + esc(f.title) + '</h2><p class="meta">' + meta(f, t) + '</p>' +
+            '<div class="acts">' + actions(f, t, 'detail') + '</div>' +
+            (c.tagline ? '<p class="tl">' + esc(c.tagline) + '</p>' : '') + '<p class="syn">' + esc(body || t.soonBody) + '</p>' +
+            (f.credits.length ? '<dl>' + f.credits.map(function (k) { return '<div><dt>' + esc(k[lang]) + '</dt><dd>' + esc(k.name) + '</dd></div>'; }).join('') + '</dl>' : '') +
+            '<a class="more" href="' + esc(f.url[lang]) + '" target="_blank" rel="noopener">' + esc(t.full) + ' ↗</a></div>';
+        }
+        function vimeo(id) { var p = String(id).split(/[\/?]h?=?/); return 'https://player.vimeo.com/video/' + encodeURIComponent(p[0]) + '?autoplay=1&dnt=1&title=0&byline=0&portrait=0' + (p[1] ? '&h=' + encodeURIComponent(p[1]) : ''); }
+
+        var depth = 0, lastFocus = null;
+        function show(el, focusEl) { if (el.hidden) { el.hidden = false; requestAnimationFrame(function () { el.classList.add('in'); }); } $('app').inert = true; (focusEl || el).focus({ preventScroll: true }); }
+        function hide(el) { el.classList.remove('in'); el.hidden = true; }
+        function route() {
+          var parts = decodeURIComponent(location.hash.slice(1)).split('/'); var f = bySlug(parts[0]); var mode = parts[1];
+          var id = f && (mode === 'film' ? (canPlay(f) ? f.film : '') : mode === 'trailer' ? f.trailer : '');
+          if (f && id) {
+            hide($('detail')); $('screen').innerHTML = '<iframe src="' + esc(vimeo(id)) + '" title="' + esc(f.title) + '" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+            show($('theater'), $('t-close')); document.body.classList.add('lock');
+          } else if (f) {
+            $('screen').innerHTML = ''; hide($('theater')); detail(f); show($('detail'), $('panel')); $('panel').scrollTop = 0; document.body.classList.add('lock');
+          } else {
+            $('screen').innerHTML = ''; hide($('theater')); hide($('detail')); $('app').inert = false; document.body.classList.remove('lock');
+            if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true }); lastFocus = null; depth = 0;
+          }
+        }
+        function close() { if (depth > 0) { depth--; history.back(); } else { history.replaceState(null, '', location.pathname + location.search); route(); } }
+        document.addEventListener('click', function (e) {
+          var a = e.target.closest && e.target.closest('a[href^="#"]');
+          if (a) { if (a.id === 'home') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; } if (!location.hash) lastFocus = a; depth++; return; }
+          if (e.target.closest && e.target.closest('[data-close]')) { if (!$('help').hidden) { hide($('help')); $('app').inert = false; $('install').focus(); } else close(); }
+        });
+        $('t-close').addEventListener('click', close);
+        window.addEventListener('hashchange', route);
+        document.addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; if (!$('help').hidden) { hide($('help')); $('app').inert = false; } else if (location.hash) close(); });
+        $('lang').addEventListener('click', function () { lang = lang === 'es' ? 'en' : 'es'; store.set('sala-lang', lang); render(); });
+        var onScroll = function () { $('top').classList.toggle('solid', window.scrollY > 24); }; onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+        // instalación
+        var standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+        var deferred = null; var btn = $('install');
+        if (standalone) document.documentElement.classList.add('standalone'); else btn.hidden = false;
+        window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; });
+        window.addEventListener('appinstalled', function () { btn.hidden = true; deferred = null; });
+        btn.addEventListener('click', function () {
+          if (deferred) { deferred.prompt(); deferred.userChoice.then(function () { deferred = null; }); return; }
+          var t = T[lang]; var ua = navigator.userAgent; var ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+          var steps = ios ? t.ios : /android/i.test(ua) ? t.android : t.desktop;
+          $('help-panel').innerHTML = '<h2 id="h-title">' + esc(t.hTitle) + '</h2><p class="hl">' + esc(t.hLead) + '</p><ol>' + steps.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ol><button type="button" class="btn solid" data-close>' + esc(t.ok) + '</button>';
+          show($('help'), $('help-panel'));
+        });
+
+        render(); route();
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('/sala/sw.js', { scope: '/sala/' }).catch(function () {});
+      })();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #0b0a09; --bg-2: #171513; --ink: #f1ede6; --muted: #a39b8f; --line: rgba(241, 237, 230, .14); --accent: #d2452f;
+    --sans: 'Instrument Sans Variable', 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif; --serif: 'Newsreader Variable', Georgia, serif;
+    --gut: clamp(18px, 4vw, 56px); --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
+  body.lock { overflow: hidden; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  h1, h2 { margin: 0; font-weight: 500; letter-spacing: -0.035em; line-height: 1.02; text-wrap: balance; }
+  p { margin: 0; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  .top { position: fixed; inset: 0 0 auto 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; height: calc(60px + var(--sat)); padding: var(--sat) var(--gut) 0; background: linear-gradient(to bottom, rgba(11, 10, 9, .8), rgba(11, 10, 9, 0)); transition: background .3s; }
+  .top.solid { background: rgba(11, 10, 9, .9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+  .mark { display: flex; align-items: center; gap: 12px; font-size: 19px; font-weight: 500; letter-spacing: -0.02em; }
+  .mark svg { height: 28px; width: auto; }
+  .tools { display: flex; gap: 8px; }
+  .pill { cursor: pointer; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 0; background: var(--ink); color: var(--bg); font-size: 13.5px; font-weight: 500; }
+  .pill.quiet { background: rgba(241, 237, 230, .12); color: var(--ink); min-width: 44px; }
+  .pill:hover { opacity: .85; }
+
+  .hero { position: relative; min-height: min(78svh, 760px); display: flex; align-items: flex-end; padding: 120px var(--gut) clamp(36px, 6vw, 72px); isolation: isolate; }
+  .hero .bg { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+  .hero::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, var(--bg) 0%, rgba(11, 10, 9, .72) 26%, rgba(11, 10, 9, .08) 62%), linear-gradient(to right, rgba(11, 10, 9, .55), rgba(11, 10, 9, 0) 60%); }
+  .hc { max-width: 620px; }
+  .hero h1 { font-size: clamp(40px, 6.4vw, 88px); margin: 14px 0 12px; }
+  .hero h1.ti img { width: min(74vw, 460px); height: auto; }
+  .tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: var(--ink); }
+  .tag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .tag.on::before { background: var(--accent); box-shadow: 0 0 0 4px rgba(210, 69, 47, .25); }
+  .meta { color: var(--muted); font-size: 14.5px; }
+  .meta i { font-style: normal; opacity: .6; padding: 0 2px; }
+  .log { margin-top: 14px; font-family: var(--serif); font-style: italic; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.35; max-width: 34em; }
+  .acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .btn { cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 20px; border-radius: 999px; border: 0; background: rgba(241, 237, 230, .14); color: var(--ink); font-size: 15px; font-weight: 500; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: background .2s, transform .2s; }
+  .btn:hover { background: rgba(241, 237, 230, .24); }
+  .btn.solid { background: var(--ink); color: var(--bg); }
+  .btn.solid:hover { background: #fff; }
+  .btn:active { transform: scale(.97); }
+
+  .rowx { padding-top: clamp(22px, 3vw, 40px); }
+  .rowx h2 { font-size: clamp(18px, 1.6vw, 22px); letter-spacing: -0.02em; padding: 0 var(--gut) 12px; }
+  .strip { display: grid; grid-auto-flow: column; grid-auto-columns: min(72vw, 340px); gap: 12px; overflow-x: auto; padding: 0 var(--gut) 6px; scroll-snap-type: x proximity; scroll-padding-inline: var(--gut); scrollbar-width: none; }
+  .strip::-webkit-scrollbar { display: none; }
+  .card { position: relative; display: block; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: var(--bg-2); scroll-snap-align: start; isolation: isolate; }
+  .card img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+  .card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(11, 10, 9, .88), rgba(11, 10, 9, 0) 58%); box-shadow: inset 0 0 0 1px transparent; border-radius: inherit; transition: box-shadow .2s; }
+  .card:hover img, .card:focus-visible img { transform: scale(1.05); }
+  .card:hover::after, .card:focus-visible::after { box-shadow: inset 0 0 0 1.5px rgba(241, 237, 230, .7); }
+  .card.bare { background: radial-gradient(120% 100% at 15% 0%, #26221d, #100e0d 65%); }
+  .card .ghost { position: absolute; inset: 0; display: grid; place-items: center; padding: 10%; text-align: center; font-size: clamp(22px, 2.4vw, 30px); font-weight: 500; letter-spacing: -0.03em; line-height: 1; color: rgba(241, 237, 230, .2); }
+  .ct { position: absolute; z-index: 1; inset: auto 0 0 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 1px; }
+  .ct b { font-size: 16.5px; font-weight: 500; letter-spacing: -0.015em; line-height: 1.2; }
+  .ct small { font-size: 12.5px; color: var(--muted); }
+  .foot { display: flex; justify-content: space-between; gap: 16px; padding: clamp(40px, 6vw, 72px) var(--gut) calc(28px + var(--sab)); color: var(--muted); font-size: 13px; }
+  .foot a:hover { color: var(--ink); }
+
+  .sheet { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; }
+  .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .66); opacity: 0; transition: opacity .25s; }
+  .panel { position: relative; width: 100%; max-width: 900px; max-height: 100dvh; height: 100dvh; overflow-y: auto; overscroll-behavior: contain; background: #12100f; outline: 0; transform: translateY(28px); opacity: 0; transition: transform .35s cubic-bezier(.2, .7, .2, 1), opacity .25s; }
+  .sheet.in .scrim { opacity: 1; }
+  .sheet.in .panel { transform: none; opacity: 1; }
+  .x { position: absolute; z-index: 2; top: calc(12px + var(--sat)); right: 12px; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; background: rgba(11, 10, 9, .7); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .dh { position: relative; aspect-ratio: 16 / 9; background: var(--bg-2); }
+  .dh.bare { aspect-ratio: auto; height: calc(72px + var(--sat)); background: none; }
+  .dh img { width: 100%; height: 100%; object-fit: cover; }
+  .dh:not(.bare)::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, #12100f, rgba(18, 16, 15, 0) 55%); }
+  .db { position: relative; padding: 0 clamp(18px, 4vw, 44px) calc(40px + var(--sab)); margin-top: -28px; }
+  .dh.bare + .db { margin-top: 0; }
+  .db h2 { font-size: clamp(30px, 4vw, 48px); margin: 10px 0 8px; }
+  .tl { margin-top: 26px; font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 1.3; }
+  .syn { margin-top: 14px; max-width: 62ch; color: #d9d3c9; line-height: 1.6; }
+  .tl + .syn { margin-top: 10px; }
+  .acts + .syn { margin-top: 26px; }
+  dl { margin: 26px 0 0; padding-top: 18px; border-top: 1px solid var(--line); display: grid; gap: 8px; font-size: 14.5px; }
+  dl div { display: grid; grid-template-columns: minmax(120px, 34%) 1fr; gap: 12px; }
+  dt { color: var(--muted); } dd { margin: 0; }
+  .more { display: inline-block; margin-top: 26px; font-size: 14px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+  .more:hover { color: var(--ink); border-color: var(--ink); }
+  @media (min-width: 900px) {
+    .sheet { align-items: center; padding: 32px; }
+    .panel { height: auto; max-height: calc(100dvh - 64px); border-radius: 14px; }
+  }
+  .panel.small { height: auto; max-width: 440px; border-radius: 18px 18px 0 0; padding: 28px 24px calc(24px + var(--sab)); }
+  @media (min-width: 900px) { .panel.small { border-radius: 14px; } }
+  .panel.small h2 { font-size: 26px; }
+  .hl { margin-top: 10px; color: var(--muted); }
+  .panel.small ol { margin: 20px 0 24px; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 12px; }
+  .panel.small li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; }
+  .panel.small li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; background: rgba(241, 237, 230, .12); display: grid; place-items: center; font-size: 13px; font-weight: 500; }
+  .panel.small .btn { width: 100%; }
+
+  .theater { position: fixed; inset: 0; z-index: 50; background: #000; }
+  .screen { position: absolute; inset: 0; }
+  .screen iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .back { position: absolute; z-index: 2; top: calc(12px + var(--sat)); left: 12px; display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 14px 0 8px; border-radius: 999px; border: 0; cursor: pointer; background: rgba(20, 18, 16, .78); font-size: 14px; font-weight: 500; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+
+  @media (max-width: 600px) {
+    .hero { min-height: 72svh; }
+    .acts .btn { flex: 1 1 auto; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
+</style>

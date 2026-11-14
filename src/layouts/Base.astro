@@ -1,8 +1,9 @@
 ---
 import '@fontsource-variable/newsreader';
 import '@fontsource-variable/newsreader/wght-italic.css';
-import '@fontsource/ibm-plex-mono/400.css';
-import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource-variable/instrument-sans';
+import Isotipo from '../components/Isotipo.astro';
+import Logo from '../components/Logo.astro';
 import '../styles/global.css';
 import { routes, ui, settings, mailto, type Lang } from '../lib/site';
 
@@ -45,18 +46,17 @@ const mail = mailto(lang === 'es' ? 'Hola, EL CAMINO CINE' : 'Hello, EL CAMINO C
     <meta property="og:locale" content={lang === 'es' ? 'es_CO' : 'en_US'} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#0b0a09" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/favicon-light.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" href="/favicon-dark.png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icons/icon-180.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="preload" href="/fonts/ECCDisplay-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <slot name="head" />
   </head>
   <body>
     <a class="skip" href="#main">{t.skip}</a>
     <header class:list={['site-head', { solid: solidHead }]} data-solid={solidHead ? '1' : '0'}>
       <a class="brand" href={r.home} aria-label="EL CAMINO CINE">
-        <img src="/icons/isotipo-white.png" alt="" width="26" height="29" />
-        <span>EL CAMINO CINE</span>
+        <Isotipo />
       </a>
       <nav class="nav" aria-label={t.menu}>
         {links.map((l) => <a href={l.href} aria-current={current === l.key ? 'page' : undefined}>{l.label}</a>)}
@@ -66,7 +66,7 @@ const mail = mailto(lang === 'es' ? 'Hola, EL CAMINO CINE' : 'Hello, EL CAMINO C
     <main id="main"><slot /></main>
     <footer class="site-foot">
       <div class="wrap">
-        <div class="big" aria-hidden="true">El Camino Cine</div>
+        <a class="logo" href={r.home} aria-label="EL CAMINO CINE"><Logo /></a>
         <div class="cols">
           <nav aria-label="Footer">
             {links.map((l) => <a href={l.href}>{l.label}</a>)}
@@ -108,7 +108,8 @@ const mail = mailto(lang === 'es' ? 'Hola, EL CAMINO CINE' : 'Hello, EL CAMINO C
           card.addEventListener('mouseenter', start); card.addEventListener('mouseleave', stop);
           card.addEventListener('focus', start); card.addEventListener('blur', stop);
         });
-        if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('/sw.js').catch(function () {}); }
+        // el sitio ya no se instala: la app es la Sala (/sala/). Retira el service worker antiguo del sitio.
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { if (new URL(r.scope).pathname === '/') r.unregister(); }); }).catch(function () {}); }
       })();
     </script>
   </body>

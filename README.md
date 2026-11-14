@@ -1,6 +1,6 @@
 # EL CAMINO CINE — sitio web
 
-Sitio estático bilingüe (ES/EN) hecho con [Astro](https://astro.build). Incluye la sala de proyección instalable como app (PWA) y un panel de contenido en `/admin/`.
+Sitio estático bilingüe (ES/EN) hecho con [Astro](https://astro.build). Incluye la Sala (`/sala/`), una app aparte que se instala en teléfono o computador (PWA con su propio manifest y service worker en `public/sala/`), y un panel de contenido en `/admin/`.
 
 ## Desarrollo
 

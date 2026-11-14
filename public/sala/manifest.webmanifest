@@ -1,21 +1,19 @@
 {
-  "name": "EL CAMINO CINE",
-  "short_name": "El Camino",
-  "description": "Películas, series y la sala de proyección de EL CAMINO CINE.",
+  "id": "/sala/",
+  "name": "Sala — El Camino Cine",
+  "short_name": "Sala",
+  "description": "La sala de EL CAMINO CINE: películas y series para ver.",
   "start_url": "/sala/",
-  "scope": "/",
+  "scope": "/sala/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0b0a09",
   "theme_color": "#0b0a09",
   "lang": "es",
+  "categories": ["entertainment"],
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
     { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ],
-  "shortcuts": [
-    { "name": "Sala", "url": "/sala/" },
-    { "name": "Películas", "url": "/peliculas/" }
   ]
 }
