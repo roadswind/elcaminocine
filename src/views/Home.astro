@@ -21,10 +21,8 @@ const L = lang === 'es'
         <div class="shade"></div>
         <div class="copy wrap">
           <p class="tag" data-status={f.status}>{t.status[f.status]} · {t.format[f.format]}</p>
-          {f.titleImage
-            ? <h2 class="has-img"><img src={f.titleImage} alt={f.title} /></h2>
-            : <h2>{f.title}</h2>}
-          {f[lang].tagline && <p class="tl"><em>{f[lang].tagline}</em></p>}
+          <h2>{f.title}</h2>
+          {(f[lang].tagline || f[lang].logline) && <p class="tl"><em>{f[lang].tagline || f[lang].logline}</em></p>}
           <a class="btn" href={filmPath(lang, f.slug)} tabindex={i === 0 ? 0 : -1}>{f.status === 'estreno' ? t.viewFilm : t.viewProject} <span class="arr">→</span></a>
         </div>
       </article>
@@ -89,9 +87,7 @@ const L = lang === 'es'
   .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,10,9,.94) 0%, rgba(11,10,9,.42) 34%, rgba(11,10,9,0) 62%), linear-gradient(to right, rgba(11,10,9,.5), rgba(11,10,9,0) 55%); }
   .copy { position: absolute; inset: auto 0 0 0; padding-bottom: clamp(108px, 15vh, 160px); }
   .copy h2 { font-size: clamp(39px, 6.8vw, 115px); margin: 14px 0 10px; max-width: 17ch; }
-  .copy h2.has-img { max-width: none; }
-  .copy h2.has-img img { width: min(78vw, 820px); height: auto; margin-left: -1%; }
-  .copy .tl { font-size: clamp(19px, 1.9vw, 30px); margin-bottom: 26px; max-width: 30ch; line-height: 1.25; }
+  .copy .tl { font-size: clamp(19px, 1.9vw, 30px); margin-bottom: 26px; max-width: 38ch; line-height: 1.25; }
   .slide .copy > * { opacity: 0; transform: translateY(16px); }
   .slide.on .copy > * { opacity: 1; transform: none; transition: opacity .9s ease .35s, transform .9s cubic-bezier(.2,.7,.2,1) .35s; }
   .slide.on .copy > *:nth-child(2) { transition-delay: .45s; } .slide.on .copy > *:nth-child(3) { transition-delay: .55s; } .slide.on .copy > *:nth-child(4) { transition-delay: .65s; }

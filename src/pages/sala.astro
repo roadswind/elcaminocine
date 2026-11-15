@@ -128,8 +128,8 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
           if (feat) {
             $('hero').innerHTML = (feat.frames ? '<img class="bg" src="' + frame(feat, 1, 1600) + '" srcset="' + srcset(feat, 1) + '" sizes="100vw" alt="" fetchpriority="high" style="object-position:' + esc(feat.focus) + '">' : '') +
               '<div class="hc"><p class="tag' + (canPlay(feat) ? ' on' : '') + '">' + esc(canPlay(feat) ? t.now : t.st[feat.status]) + '</p>' +
-              (feat.titleImage ? '<h1 class="ti"><img src="' + esc(feat.titleImage) + '" alt="' + esc(feat.title) + '"></h1>' : '<h1>' + esc(feat.title) + '</h1>') +
-              '<p class="meta">' + meta(feat, t) + '</p>' + (feat[lang].logline ? '<p class="log">' + esc(feat[lang].logline) + '</p>' : '') +
+              '<h1>' + esc(feat.title) + '</h1>' +
+              '<p class="meta">' + meta(feat, t) + '</p>' + ((feat[lang].tagline || feat[lang].logline) ? '<p class="log">' + esc(feat[lang].tagline || feat[lang].logline) + '</p>' : '') +
               '<div class="acts">' + actions(feat, t, 'hero') + '</div></div>';
           }
           var rows = [[t.now, now], [t.soon, soon], [t.dev, dev]].filter(function (r) { return r[1].length; });
@@ -221,7 +221,7 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
   .top { position: fixed; inset: 0 0 auto 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; height: calc(60px + var(--sat)); padding: var(--sat) var(--gut) 0; background: linear-gradient(to bottom, rgba(11, 10, 9, .8), rgba(11, 10, 9, 0)); transition: background .3s; }
   .top.solid { background: rgba(11, 10, 9, .9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
   .mark { display: flex; align-items: center; gap: 12px; font-size: 19px; font-weight: 500; letter-spacing: -0.02em; }
-  .mark svg { height: 28px; width: auto; }
+  .mark svg { height: 30px; width: 27px; flex: none; overflow: visible; }
   .tools { display: flex; gap: 8px; }
   .pill { cursor: pointer; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 0; background: var(--ink); color: var(--bg); font-size: 13.5px; font-weight: 500; }
   .pill.quiet { background: rgba(241, 237, 230, .12); color: var(--ink); min-width: 44px; }

@@ -21,7 +21,7 @@ const initials = (n: string) => n.split(' ').map((w) => w[0]).slice(0, 2).join('
     <h2 class="label">{L.team}</h2>
     {team.members.map((m) => (
       <article class="m reveal">
-        <div class="ph">{m.photo ? <img src={m.photo} alt={m.name} loading="lazy" /> : <span aria-hidden="true">{initials(m.name)}</span>}</div>
+        <div class="ph">{m.photo ? <img src={m.photo} alt={m.name} width="1120" height="1400" loading="lazy" decoding="async" /> : <span aria-hidden="true">{initials(m.name)}</span>}</div>
         <div>
           <h3>{m.name}</h3>
           <p class="label"><b>{es ? m.roleEs : m.roleEn}</b></p>
