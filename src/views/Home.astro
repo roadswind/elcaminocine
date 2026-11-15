@@ -9,8 +9,8 @@ const slides = films.filter((f) => f.frames > 0);
 const formats = ['cortometraje', 'largometraje', 'serie'] as const;
 const feature = films.find((f) => f.slug === 'nancy-and-nancy');
 const L = lang === 'es'
-  ? { catalog: 'Catálogo', prodKicker: 'Para productores extranjeros', prodTitle: 'Filma en Colombia.', prodBody: 'Colombia devuelve hasta el 35 % del gasto elegible de producciones internacionales. Te explicamos cómo funciona y calculamos tu incentivo en un minuto.', prodCta: 'Calcula tu incentivo', aboutCta: 'Conócenos', manifesto: 'El camino se hace película a película.' }
-  : { catalog: 'Catalogue', prodKicker: 'For international producers', prodTitle: 'Shoot in Colombia.', prodBody: 'Colombia returns up to 35% of eligible spend for international productions. We explain how it works and estimate your incentive in one minute.', prodCta: 'Estimate your incentive', aboutCta: 'About us', manifesto: 'The road is made one film at a time.' };
+  ? { catalog: 'Catálogo', prodKicker: 'Para productores extranjeros', prodTitle: 'Filma en Colombia.', prodBody: 'Colombia devuelve hasta el 35 % del gasto elegible de producciones internacionales. Te explicamos cómo funciona y calculamos tu incentivo en un minuto.', prodCta: 'Calcula tu incentivo', aboutCta: 'Conócenos', manifesto: 'Somos coloridos entusiastas de la narrativa cinematográfica, abanderados de la belleza y audaces escritores de la historia.' }
+  : { catalog: 'Catalogue', prodKicker: 'For international producers', prodTitle: 'Shoot in Colombia.', prodBody: 'Colombia returns up to 35% of eligible spend for international productions. We explain how it works and estimate your incentive in one minute.', prodCta: 'Estimate your incentive', aboutCta: 'About us', manifesto: 'We are colorful enthusiasts of cinematic storytelling, standard-bearers of beauty and bold writers of history.' };
 ---
 <Base lang={lang} alt={routes[lang === 'es' ? 'en' : 'es'].home}>
   <link slot="head" rel="preload" as="image" href={frameSrc(slides[0].slug, 1, 1600)} imagesrcset={frameSet(slides[0].slug, 1)} imagesizes="100vw" />
@@ -117,7 +117,7 @@ const L = lang === 'es'
   .prod p { max-width: 40ch; }
   @media (max-width: 800px) { .prod { grid-template-columns: 1fr; } }
   .mani { border-top: 1px solid var(--line); padding-block: clamp(56px, 9vw, 140px) 0; display: flex; flex-direction: column; gap: 28px; align-items: flex-start; }
-  .mani p { font-family: var(--serif); font-style: italic; font-size: clamp(30px, 5.4vw, 92px); line-height: 1.04; max-width: 16ch; margin: 0; letter-spacing: -.01em; }
+  .mani p { font-family: var(--serif); font-style: italic; font-size: clamp(26px, 3.6vw, 60px); line-height: 1.12; max-width: 26ch; margin: 0; letter-spacing: -.01em; }
 </style>
 
 <script>

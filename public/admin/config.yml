@@ -120,6 +120,6 @@ collections:
               - { name: name, label: Nombre }
               - { name: roleEs, label: Cargo (ES) }
               - { name: roleEn, label: Cargo (EN) }
-              - { name: photo, label: Foto (4:5), widget: image, required: false }
+              - { name: photo, label: Foto (cuadrada), widget: image, required: false }
               - { name: bioEs, label: Bio (ES), widget: text }
               - { name: bioEn, label: Bio (EN), widget: text }
