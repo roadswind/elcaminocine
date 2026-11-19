@@ -23,7 +23,7 @@ const L = lang === 'es'
           <p class="tag" data-status={f.status}>{t.status[f.status]} · {t.format[f.format]}</p>
           <h2>{f.title}</h2>
           {(f[lang].tagline || f[lang].logline) && <p class="tl"><em>{f[lang].tagline || f[lang].logline}</em></p>}
-          <a class="btn" href={filmPath(lang, f.slug)} tabindex={i === 0 ? 0 : -1}>{f.status === 'estreno' ? t.viewFilm : t.viewProject} <span class="arr">→</span></a>
+          <a class="btn" href={filmPath(lang, f.slug)} tabindex={i === 0 ? 0 : -1}>{f.status === 'estreno' || f.status === 'disponible' ? t.viewFilm : t.viewProject} <span class="arr">→</span></a>
         </div>
       </article>
     ))}

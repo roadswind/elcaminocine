@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Player from '../components/Player.astro';
-import { films, ui, routes, filmPath, pressPath, frameSrc, frameSet, mailto, type Lang } from '../lib/site';
+import { films, ui, routes, filmPath, pressPath, frameSrc, frameSet, mailto, type Lang, vimeoSrc } from '../lib/site';
 interface Props { lang: Lang; film: any }
 const { lang, film } = Astro.props;
 const t = ui[lang]; const r = routes[lang]; const c = film[lang];
@@ -16,9 +16,13 @@ const notify = mailto(`${film.title} — ${t.notify}`);
 const frames = Array.from({ length: film.frames }, (_, i) => i + 1);
 const bts = Array.from({ length: film.bts || 0 }, (_, i) => i + 1);
 const hasPress = film.press?.length > 0;
+const trailerSrc = vimeoSrc(film.trailerVimeoId);
+const filmSrc = !dev && film.watch === 'public' ? vimeoSrc(film.filmVimeoId) : '';
+// el reproductor principal muestra el tráiler; si aún no hay tráiler y la película está disponible, muestra la película
+const heroSrc = trailerSrc || filmSrc;
 ---
 <Base lang={lang} title={film.title} description={c.logline || undefined} alt={filmPath(other, film.slug)} current="films" image={film.frames ? frameSrc(film.slug, 1, 1600) : undefined}>
-  <Player vimeoId={film.trailerVimeoId} poster={film.frames ? frameSrc(film.slug, 1, 1600) : ''} posterSet={film.frames ? frameSet(film.slug, 1) : undefined} label={t.playTrailer} soonLabel={dev ? t.status[film.status] : t.trailerSoon} focus={film.focus} title={film.title} />
+  <Player src={heroSrc} poster={film.frames ? frameSrc(film.slug, 1, 1600) : ''} posterSet={film.frames ? frameSet(film.slug, 1) : undefined} label={trailerSrc ? t.playTrailer : t.watchFilm} soonLabel={dev ? t.status[film.status] : t.trailerSoon} focus={film.focus} title={film.title} />
 
   <div class="wrap top">
     <div class="ttl">
@@ -30,9 +34,9 @@ const hasPress = film.press?.length > 0;
       {c.tagline && <p class="tl"><em>{c.tagline}</em></p>}
       {c.logline ? <p class="ll">{c.logline}</p> : <p class="ll muted">{t.detailsSoon}</p>}
       <div class="cta">
-        {!dev && film.watch === 'public' && film.filmVimeoId && <a class="btn" href={`${r.watch}#${film.slug}`}>{t.watchFilm} <span class="arr">→</span></a>}
+        {!dev && filmSrc && <a class="btn" href={`${r.watch}#${film.slug}`}>{t.watchFilm} <span class="arr">→</span></a>}
         {!dev && film.watch !== 'public' && <a class="btn" href={`${r.watch}#${film.slug}`}>{t.watchSoon} <span class="arr">→</span></a>}
-        {!dev && notify && <a class="btn ghost" href={notify}>{t.notify}</a>}
+        {!dev && !filmSrc && notify && <a class="btn ghost" href={notify}>{t.notify}</a>}
         {dev && support && <a class="btn" href={support}>{t.support} <span class="arr">→</span></a>}
         {dev && collab && <a class="btn ghost" href={collab}>{t.collaborate}</a>}
         {hasPress && <a class="btn ghost" href={pressPath(lang, film.slug)}>{t.press}</a>}

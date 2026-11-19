@@ -3,7 +3,7 @@
 import '@fontsource-variable/instrument-sans';
 import '@fontsource-variable/newsreader/wght-italic.css';
 import Isotipo from '../components/Isotipo.astro';
-import { films, settings, filmPath } from '../lib/site';
+import { films, settings, filmPath, vimeoSrc } from '../lib/site';
 
 const pick = (c: any) => ({ tagline: c.tagline || '', logline: c.logline || '', synopsis: c.synopsis || '', genre: c.genre || '' });
 const data = {
@@ -11,7 +11,7 @@ const data = {
   films: films.map((f) => ({
     slug: f.slug, title: f.title, titleImage: f.titleImage || '', format: f.format, kind: f.kind, status: f.status,
     year: f.year || '', runtime: f.runtime || '', frames: f.frames || 0, focus: f.focus || '50% 50%',
-    watch: f.watch || 'none', trailer: f.trailerVimeoId || '', film: f.filmVimeoId || '',
+    watch: f.watch || 'none', trailer: vimeoSrc(f.trailerVimeoId), film: vimeoSrc(f.filmVimeoId),
     es: pick(f.es), en: pick(f.en),
     credits: (f.credits || []).slice(0, 5),
     url: { es: filmPath('es', f.slug), en: filmPath('en', f.slug) },
@@ -148,7 +148,7 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
             (f.credits.length ? '<dl>' + f.credits.map(function (k) { return '<div><dt>' + esc(k[lang]) + '</dt><dd>' + esc(k.name) + '</dd></div>'; }).join('') + '</dl>' : '') +
             '<a class="more" href="' + esc(f.url[lang]) + '" target="_blank" rel="noopener">' + esc(t.full) + ' ↗</a></div>';
         }
-        function vimeo(id) { var p = String(id).split(/[\/?]h?=?/); return 'https://player.vimeo.com/video/' + encodeURIComponent(p[0]) + '?autoplay=1&dnt=1&title=0&byline=0&portrait=0' + (p[1] ? '&h=' + encodeURIComponent(p[1]) : ''); }
+        function vimeo(src) { return src; }
 
         var depth = 0, lastFocus = null;
         function show(el, focusEl) { if (el.hidden) { el.hidden = false; requestAnimationFrame(function () { el.classList.add('in'); }); } $('app').inert = true; (focusEl || el).focus({ preventScroll: true }); }
@@ -157,7 +157,7 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
           var parts = decodeURIComponent(location.hash.slice(1)).split('/'); var f = bySlug(parts[0]); var mode = parts[1];
           var id = f && (mode === 'film' ? (canPlay(f) ? f.film : '') : mode === 'trailer' ? f.trailer : '');
           if (f && id) {
-            hide($('detail')); $('screen').innerHTML = '<iframe src="' + esc(vimeo(id)) + '" title="' + esc(f.title) + '" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+            hide($('detail')); $('screen').innerHTML = '<iframe src="' + esc(vimeo(id)) + '" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(f.title) + '" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen></iframe>';
             show($('theater'), $('t-close')); document.body.classList.add('lock');
           } else if (f) {
             $('screen').innerHTML = ''; hide($('theater')); detail(f); show($('detail'), $('panel')); $('panel').scrollTop = 0; document.body.classList.add('lock');

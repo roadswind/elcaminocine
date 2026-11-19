@@ -1,10 +1,10 @@
 ---
-interface Props { vimeoId?: string; poster: string; posterSet?: string; label: string; soonLabel: string; focus?: string; title: string }
-const { vimeoId = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title } = Astro.props;
+interface Props { src?: string; poster: string; posterSet?: string; label: string; soonLabel: string; focus?: string; title: string }
+const { src = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title } = Astro.props;
 ---
-<div class="player" data-vimeo={vimeoId}>
+<div class="player" data-src={src}>
   {poster ? <img src={poster} srcset={posterSet} sizes="100vw" alt="" style={`object-position:${focus}`} fetchpriority="high" /> : <div class="blank"></div>}
-  {vimeoId ? (
+  {src ? (
     <button type="button" class="play" aria-label={`${label}: ${title}`}>
       <span class="ring"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg></span>
       <span class="label"><b>{label}</b></span>
@@ -28,13 +28,13 @@ const { vimeoId = '', poster, posterSet, label, soonLabel, focus = '50% 50%', ti
   @media (max-width: 700px) { .player { aspect-ratio: 4 / 3; } }
 </style>
 <script>
-  document.querySelectorAll<HTMLElement>('.player[data-vimeo]').forEach((p) => {
-    const id = p.dataset.vimeo; const btn = p.querySelector('.play');
-    if (!id || !btn) return;
+  document.querySelectorAll<HTMLElement>('.player[data-src]').forEach((p) => {
+    const src = p.dataset.src; const btn = p.querySelector('.play');
+    if (!src || !btn) return;
     btn.addEventListener('click', () => {
       const f = document.createElement('iframe');
-      f.src = `https://player.vimeo.com/video/${id}?autoplay=1&dnt=1&title=0&byline=0&portrait=0`;
-      f.allow = 'autoplay; fullscreen; picture-in-picture'; f.allowFullscreen = true; f.title = btn.getAttribute('aria-label') || 'Video';
+      f.src = src; f.referrerPolicy = 'strict-origin-when-cross-origin';
+      f.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media'; f.allowFullscreen = true; f.title = btn.getAttribute('aria-label') || 'Video';
       p.appendChild(f); p.classList.add('playing'); btn.remove();
     });
   });

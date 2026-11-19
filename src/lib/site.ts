@@ -67,3 +67,12 @@ export const frameSet = (slug: string, n: number) =>
   [800, 1600, 2560].map((w) => `${frameSrc(slug, n, w)} ${w}w`).join(', ');
 
 export { settings };
+
+/** Convierte un ID o enlace de Vimeo (incluido el código privado de videos ocultos) en la URL del reproductor. */
+export function vimeoSrc(raw?: string): string {
+  const s = String(raw || '').trim();
+  const id = (s.match(/(\d{6,})/) || [])[1];
+  if (!id) return '';
+  const h = (s.match(/[?&]h=([0-9a-f]+)/i) || s.match(new RegExp(id + '/([0-9a-f]{6,})', 'i')) || [])[1];
+  return `https://player.vimeo.com/video/${id}?${h ? `h=${h}&` : ''}autoplay=1&dnt=1&title=0&byline=0&portrait=0`;
+}
