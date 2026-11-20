@@ -33,7 +33,7 @@ collections:
       - { name: framesV, label: 'Versión de los frames (cámbiala al reemplazar imágenes, p. ej. la fecha)', required: false }
       - { name: focus, label: 'Punto focal (p. ej. 50% 35%)', default: '50% 50%' }
       - { name: poster, label: Tiene póster, widget: boolean, default: false }
-      - { name: bts, label: Fotos de detrás de cámaras, widget: number, value_type: int, default: 0 }
+      - { name: bts, label: 'Fotos de detrás de cámaras (archivos bts-<id>-800/1600.webp en /media/<slug>/)', widget: list, required: false, fields: [{ name: id, label: ID }, { name: w, label: Ancho, widget: number, value_type: int }, { name: h, label: Alto, widget: number, value_type: int }] }
       - { name: clip, label: 'Clip para hover (.mp4 liviano)', widget: file, required: false }
       - { name: trailerVimeoId, label: Enlace del tráiler (YouTube o Vimeo), required: false }
       - { name: filmVimeoId, label: Enlace de la película (Vimeo o YouTube; pega el enlace completo si el video es oculto), required: false }
