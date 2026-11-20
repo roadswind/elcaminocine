@@ -61,10 +61,14 @@ export const ui = {
 export const mailto = (subject: string) =>
   settings.email ? `mailto:${settings.email}?subject=${encodeURIComponent(subject)}` : '';
 
+// framesV (opcional) cambia la dirección cuando se reemplazan los frames, para que navegadores y Cloudflare no muestren los viejos
+const framesV = (slug: string) => (films.find((f) => f.slug === slug) as any)?.framesV;
 export const frameSrc = (slug: string, n: number, w = 1600) =>
-  `/media/${slug}/frame-${String(n).padStart(2, '0')}-${w}.webp`;
+  `/media/${slug}/frame-${String(n).padStart(2, '0')}-${w}.webp${framesV(slug) ? `?v=${framesV(slug)}` : ''}`;
+// el tamaño mayor es 2560 px salvo que la película indique otro (frameMax), p. ej. stills de 2K sin reescalar
+export const frameMax = (slug: string) => (films.find((f) => f.slug === slug) as any)?.frameMax || 2560;
 export const frameSet = (slug: string, n: number) =>
-  [800, 1600, 2560].map((w) => `${frameSrc(slug, n, w)} ${w}w`).join(', ');
+  [800, 1600, frameMax(slug)].map((w) => `${frameSrc(slug, n, w)} ${w}w`).join(', ');
 
 export { settings };
 

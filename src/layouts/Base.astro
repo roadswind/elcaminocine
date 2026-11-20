@@ -5,10 +5,10 @@ import '@fontsource-variable/instrument-sans';
 import Isotipo from '../components/Isotipo.astro';
 import Logo from '../components/Logo.astro';
 import '../styles/global.css';
-import { routes, ui, settings, mailto, type Lang } from '../lib/site';
+import { routes, ui, settings, mailto, frameSrc, type Lang } from '../lib/site';
 
 interface Props { lang: Lang; title?: string; description?: string; alt: string; image?: string; current?: string; noindex?: boolean; solidHead?: boolean }
-const { lang, title, description, alt, image = '/media/nancy-and-nancy/frame-01-1600.webp', current = '', noindex = false, solidHead = false } = Astro.props;
+const { lang, title, description, alt, image = frameSrc('nancy-and-nancy', 1, 1600), current = '', noindex = false, solidHead = false } = Astro.props;
 const t = ui[lang];
 const r = routes[lang];
 const fullTitle = title ? `${title} — EL CAMINO CINE` : `EL CAMINO CINE — ${t.tagline}`;

@@ -8,7 +8,7 @@
   "status": "disponible",
   "year": "2025",
   "runtime": "7 min",
-  "frames": 6,
+  "frames": 5,
   "focus": "50% 35%",
   "poster": true,
   "bts": 3,
@@ -112,11 +112,8 @@
       "es": "Still 05",
       "en": "Still 05",
       "file": "/press/nancy-and-nancy/NancyAndNancy_still_05.jpg"
-    },
-    {
-      "es": "Still 06",
-      "en": "Still 06",
-      "file": "/press/nancy-and-nancy/NancyAndNancy_still_06.jpg"
     }
-  ]
+  ],
+  "frameMax": 2048,
+  "framesV": "20261120"
 }

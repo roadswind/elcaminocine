@@ -3,13 +3,13 @@
 import '@fontsource-variable/instrument-sans';
 import '@fontsource-variable/newsreader/wght-italic.css';
 import Isotipo from '../components/Isotipo.astro';
-import { films, settings, filmPath, pressPath, vimeoSrc } from '../lib/site';
+import { films, settings, filmPath, pressPath, vimeoSrc, frameSrc } from '../lib/site';
 
 const pick = (c: any) => ({ tagline: c.tagline || '', logline: c.logline || '', synopsis: c.synopsis || '', genre: c.genre || '' });
 const data = {
   email: settings.email || '',
   films: films.map((f) => ({
-    slug: f.slug, title: f.title, titleImage: f.titleImage || '', format: f.format, kind: f.kind, status: f.status,
+    slug: f.slug, max: (f as any).frameMax || 2560, v: (f as any).framesV || '', title: f.title, titleImage: f.titleImage || '', format: f.format, kind: f.kind, status: f.status,
     year: f.year || '', runtime: f.runtime || '', frames: f.frames || 0, focus: f.focus || '50% 50%',
     watch: f.watch || 'none', trailer: vimeoSrc(f.trailerVimeoId), film: vimeoSrc(f.filmVimeoId),
     es: pick(f.es), en: pick(f.en),
@@ -20,7 +20,7 @@ const data = {
   })),
 };
 const json = JSON.stringify(data).replace(/</g, '\\u003c');
-const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href;
+const og = new URL(frameSrc('nancy-and-nancy', 1, 1600), Astro.site).href;
 ---
 <!doctype html>
 <html lang="es">
@@ -101,8 +101,8 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
         if (q) store.set('sala-lang', lang);
         var $ = function (id) { return document.getElementById(id); };
         var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-        var frame = function (f, n, w) { return '/media/' + f.slug + '/frame-' + ('0' + n).slice(-2) + '-' + w + '.webp'; };
-        var srcset = function (f, n) { return [800, 1600, 2560].map(function (w) { return frame(f, n, w) + ' ' + w + 'w'; }).join(', '); };
+        var frame = function (f, n, w) { return '/media/' + f.slug + '/frame-' + ('0' + n).slice(-2) + '-' + w + '.webp' + (f.v ? '?v=' + f.v : ''); };
+        var srcset = function (f, n) { return [800, 1600, f.max].map(function (w) { return frame(f, n, w) + ' ' + w + 'w'; }).join(', '); };
         var canPlay = function (f) { return f.watch === 'public' && !!f.film; };
         var bySlug = function (s) { return D.films.filter(function (f) { return f.slug === s; })[0]; };
         var meta = function (f, t) { return [t.fmt[f.format], f[lang].genre, f.runtime, f.year].filter(Boolean).map(esc).join(' <i>·</i> '); };
