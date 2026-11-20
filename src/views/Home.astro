@@ -6,6 +6,8 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = ui[lang]; const r = routes[lang];
 const slides = films.filter((f) => f.frames > 0);
+// frame de portada de cada película (playerFrame en la ficha; por defecto el 1)
+const cover = (f: any) => Math.min(Math.max(1, f.playerFrame || 1), f.frames || 1);
 const formats = ['cortometraje', 'largometraje', 'serie'] as const;
 const feature = films.find((f) => f.slug === 'nancy-and-nancy');
 const L = lang === 'es'
@@ -13,11 +15,11 @@ const L = lang === 'es'
   : { catalog: 'Catalogue', prodKicker: 'For international producers', prodTitle: 'Shoot in Colombia.', prodBody: 'Colombia returns up to 35% of eligible spend for international productions. We explain how it works and estimate your incentive in one minute.', prodCta: 'Estimate your incentive', aboutCta: 'About us', manifesto: 'We are colorful enthusiasts of cinematic storytelling, standard-bearers of beauty and bold writers of history.' };
 ---
 <Base lang={lang} alt={routes[lang === 'es' ? 'en' : 'es'].home}>
-  <link slot="head" rel="preload" as="image" href={frameSrc(slides[0].slug, 1, 1600)} imagesrcset={frameSet(slides[0].slug, 1)} imagesizes="100vw" />
+  <link slot="head" rel="preload" as="image" href={frameSrc(slides[0].slug, cover(slides[0]), 1600)} imagesrcset={frameSet(slides[0].slug, cover(slides[0]))} imagesizes="100vw" />
   <section class="hero" aria-roledescription="carousel" aria-label={t.films}>
     {slides.map((f, i) => (
       <article class:list={['slide', { on: i === 0 }]} data-i={i} aria-hidden={i === 0 ? 'false' : 'true'}>
-        <img src={frameSrc(f.slug, 1, 1600)} srcset={frameSet(f.slug, 1)} sizes="100vw" alt="" loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} style={`object-position:${f.focus}`} />
+        <img src={frameSrc(f.slug, cover(f), 1600)} srcset={frameSet(f.slug, cover(f))} sizes="100vw" alt="" loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} style={`object-position:${f.focus}`} />
         <div class="shade"></div>
         <div class="copy wrap">
           <p class="tag" data-status={f.status}>{t.status[f.status]} · {t.format[f.format]}</p>
@@ -45,7 +47,7 @@ const L = lang === 'es'
   {feature && (
     <section class="section feature reveal">
       <a class="band" href={filmPath(lang, feature.slug)}>
-        <img src={frameSrc(feature.slug, 2, 1600)} srcset={frameSet(feature.slug, 2)} sizes="100vw" alt="" loading="lazy" />
+        <img src={frameSrc(feature.slug, cover(feature) === 2 ? 1 : 2, 1600)} srcset={frameSet(feature.slug, cover(feature) === 2 ? 1 : 2)} sizes="100vw" alt="" loading="lazy" />
         <div class="q wrap">
           <p class="label"><b>{feature.title}</b> · {t.status[feature.status]}</p>
           <blockquote>{feature[lang].logline}</blockquote>
