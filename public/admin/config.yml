@@ -28,6 +28,7 @@ collections:
       - { name: year, label: Año, required: false }
       - { name: runtime, label: Duración, required: false }
       - { name: frames, label: 'Número de frames (archivos frame-01…)', widget: number, value_type: int, default: 0 }
+      - { name: playerFrame, label: 'Frame del póster del reproductor (número; 1 por defecto)', widget: number, value_type: int, required: false }
       - { name: frameMax, label: 'Ancho mayor de los frames (2560 por defecto; 2048 si son stills 2K)', widget: number, value_type: int, required: false }
       - { name: framesV, label: 'Versión de los frames (cámbiala al reemplazar imágenes, p. ej. la fecha)', required: false }
       - { name: focus, label: 'Punto focal (p. ej. 50% 35%)', default: '50% 50%' }

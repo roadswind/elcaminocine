@@ -20,7 +20,10 @@ const { src = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title 
 <style>
   /* proporción por defecto: DCI 4K (4096×2160), la de los frames y masters de la casa */
   .player-wrap { background: #000; }
-  .player { --ar: 1.8963; position: relative; aspect-ratio: var(--ar); width: min(100%, calc(100svh * var(--ar))); margin-inline: auto; background: #000; overflow: hidden; transition: aspect-ratio .35s ease; }
+  /* póster: siempre a todo el ancho, sin barras (se recorta arriba/abajo si la pantalla es baja) */
+  .player { --ar: 1.8963; position: relative; width: 100%; height: min(calc(100vw / var(--ar)), 100svh); margin-inline: auto; background: #000; overflow: hidden; }
+  /* reproduciendo: el video nunca se recorta; solo si la pantalla es más baja que el video se angosta para que quepa completo */
+  .player.playing { height: auto; aspect-ratio: var(--ar); width: min(100%, calc(100svh * var(--ar))); transition: aspect-ratio .35s ease; }
   .player img, .player .blank { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .4s; }
   .player .blank { background: radial-gradient(120% 90% at 20% 0%, #24201b 0%, #0b0a09 65%); }
   .player::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,10,9,.9), rgba(11,10,9,0) 40%); pointer-events: none; }
@@ -34,7 +37,7 @@ const { src = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title 
   .soon { position: absolute; z-index: 2; right: var(--gut); bottom: clamp(16px, 3vw, 32px); margin: 0; border: 1px solid var(--line); padding: 8px 12px; background: rgba(11,10,9,.5); backdrop-filter: blur(6px); }
   /* en celular el póster es más alto para que respire bajo el header; al reproducir pasa a la proporción del video */
   @media (max-width: 700px) {
-    .player:not(.playing) { aspect-ratio: 4 / 3; width: 100%; }
+    .player:not(.playing) { height: auto; aspect-ratio: 4 / 3; width: 100%; }
     .play .ring { width: 76px; height: 76px; }
   }
   :global(html.cine .site-head) { transform: translateY(-100%); opacity: 0; pointer-events: none; }

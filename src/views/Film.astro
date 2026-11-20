@@ -20,9 +20,11 @@ const trailerSrc = vimeoSrc(film.trailerVimeoId);
 const filmSrc = !dev && film.watch === 'public' ? vimeoSrc(film.filmVimeoId) : '';
 // el reproductor principal muestra el tráiler; si aún no hay tráiler y la película está disponible, muestra la película
 const heroSrc = trailerSrc || filmSrc;
+// frame de póster del reproductor (playerFrame en la ficha; por defecto el 1)
+const pf = Math.min(Math.max(1, (film as any).playerFrame || 1), film.frames || 1);
 ---
 <Base lang={lang} title={film.title} description={c.logline || undefined} alt={filmPath(other, film.slug)} current="films" image={film.frames ? frameSrc(film.slug, 1, 1600) : undefined}>
-  <Player src={heroSrc} poster={film.frames ? frameSrc(film.slug, 1, 1600) : ''} posterSet={film.frames ? frameSet(film.slug, 1) : undefined} label={trailerSrc ? t.playTrailer : t.watchFilm} soonLabel={dev ? t.status[film.status] : t.trailerSoon} focus={film.focus} title={film.title} />
+  <Player src={heroSrc} poster={film.frames ? frameSrc(film.slug, pf, 1600) : ''} posterSet={film.frames ? frameSet(film.slug, pf) : undefined} label={trailerSrc ? t.playTrailer : t.watchFilm} soonLabel={dev ? t.status[film.status] : t.trailerSoon} focus={film.focus} title={film.title} />
 
   <div class="wrap top">
     <div class="ttl">
