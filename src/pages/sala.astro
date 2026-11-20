@@ -3,7 +3,7 @@
 import '@fontsource-variable/instrument-sans';
 import '@fontsource-variable/newsreader/wght-italic.css';
 import Isotipo from '../components/Isotipo.astro';
-import { films, settings, filmPath, vimeoSrc } from '../lib/site';
+import { films, settings, filmPath, pressPath, vimeoSrc } from '../lib/site';
 
 const pick = (c: any) => ({ tagline: c.tagline || '', logline: c.logline || '', synopsis: c.synopsis || '', genre: c.genre || '' });
 const data = {
@@ -13,7 +13,9 @@ const data = {
     year: f.year || '', runtime: f.runtime || '', frames: f.frames || 0, focus: f.focus || '50% 50%',
     watch: f.watch || 'none', trailer: vimeoSrc(f.trailerVimeoId), film: vimeoSrc(f.filmVimeoId),
     es: pick(f.es), en: pick(f.en),
-    credits: (f.credits || []).slice(0, 5),
+    credits: f.credits || [],
+    specs: (f.specs || []).map((k: any) => ({ es: k.es, en: k.en, vEs: k.value, vEn: k.valueEn || k.value })),
+    press: f.press?.length ? { es: pressPath('es', f.slug), en: pressPath('en', f.slug) } : null,
     url: { es: filmPath('es', f.slug), en: filmPath('en', f.slug) },
   })),
 };
@@ -79,7 +81,7 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
           es: { now: 'Ver ahora', soon: 'Próximos estrenos', dev: 'En desarrollo', play: 'Ver', trailer: 'Tráiler', info: 'Más información', notify: 'Avísame del estreno', notifyShort: 'Avísame',
             st: { estreno: 'Próximo estreno', disponible: 'Disponible', desarrollo: 'En desarrollo', produccion: 'En producción', postproduccion: 'En postproducción' },
             fmt: { largometraje: 'Largometraje', cortometraje: 'Cortometraje', serie: 'Serie' }, soonBody: 'Más detalles próximamente.',
-            full: 'Ficha completa en el sitio', back: 'Volver', close: 'Cerrar', install: 'Instalar app', site: 'elcaminocine.com', langBtn: 'EN',
+            full: 'Ficha completa en el sitio', press: 'Prensa', credits: 'Créditos', specs: 'Ficha técnica', back: 'Volver', close: 'Cerrar', install: 'Instalar app', site: 'elcaminocine.com', langBtn: 'EN',
             hTitle: 'Instala la Sala', hLead: 'Queda en tu pantalla de inicio como cualquier app. Sin tienda, gratis y ocupa casi nada.',
             ios: ['Toca el botón Compartir de tu navegador.', 'Elige «Añadir a pantalla de inicio».', 'Toca «Añadir». Listo.'],
             android: ['Abre el menú ⋮ de tu navegador.', 'Elige «Instalar app» o «Añadir a pantalla de inicio».', 'Confirma. Listo.'],
@@ -87,7 +89,7 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
           en: { now: 'Watch now', soon: 'Coming soon', dev: 'In development', play: 'Watch', trailer: 'Trailer', info: 'More info', notify: 'Notify me at release', notifyShort: 'Notify me',
             st: { estreno: 'Premiering soon', disponible: 'Available', desarrollo: 'In development', produccion: 'In production', postproduccion: 'In post-production' },
             fmt: { largometraje: 'Feature film', cortometraje: 'Short film', serie: 'Series' }, soonBody: 'More details coming soon.',
-            full: 'Full film page on the website', back: 'Back', close: 'Close', install: 'Install app', site: 'elcaminocine.com', langBtn: 'ES',
+            full: 'Full film page on the website', press: 'Press', credits: 'Credits', specs: 'Technical details', back: 'Back', close: 'Close', install: 'Install app', site: 'elcaminocine.com', langBtn: 'ES',
             hTitle: 'Install the Sala', hLead: 'It sits on your home screen like any app. No store, free, and it takes almost no space.',
             ios: ['Tap your browser’s Share button.', 'Choose “Add to Home Screen”.', 'Tap “Add”. Done.'],
             android: ['Open your browser’s ⋮ menu.', 'Choose “Install app” or “Add to Home screen”.', 'Confirm. Done.'],
@@ -145,8 +147,9 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
             '<div class="db"><p class="tag' + (canPlay(f) ? ' on' : '') + '">' + esc(canPlay(f) ? t.st.disponible : t.st[f.status]) + '</p><h2 id="d-title">' + esc(f.title) + '</h2><p class="meta">' + meta(f, t) + '</p>' +
             '<div class="acts">' + actions(f, t, 'detail') + '</div>' +
             (c.tagline ? '<p class="tl">' + esc(c.tagline) + '</p>' : '') + '<p class="syn">' + esc(body || t.soonBody) + '</p>' +
-            (f.credits.length ? '<dl>' + f.credits.map(function (k) { return '<div><dt>' + esc(k[lang]) + '</dt><dd>' + esc(k.name) + '</dd></div>'; }).join('') + '</dl>' : '') +
-            '<a class="more" href="' + esc(f.url[lang]) + '" target="_blank" rel="noopener">' + esc(t.full) + ' ↗</a></div>';
+            (f.credits.length ? '<h3 class="lb">' + esc(t.credits) + '</h3><dl>' + f.credits.map(function (k) { return '<div><dt>' + esc(k[lang]) + '</dt><dd>' + esc(k.name) + '</dd></div>'; }).join('') + '</dl>' : '') +
+            (f.specs.length ? '<h3 class="lb">' + esc(t.specs) + '</h3><dl>' + f.specs.map(function (k) { return '<div><dt>' + esc(k[lang]) + '</dt><dd>' + esc(lang === 'en' ? k.vEn : k.vEs) + '</dd></div>'; }).join('') + '</dl>' : '') +
+            '<p class="links"><a class="more" href="' + esc(f.url[lang]) + '" target="_blank" rel="noopener">' + esc(t.full) + ' ↗</a>' + (f.press ? '<a class="more" href="' + esc(f.press[lang]) + '" target="_blank" rel="noopener">' + esc(t.press) + ' ↗</a>' : '') + '</p></div>';
         }
         function vimeo(src) { return src; }
 
@@ -280,10 +283,12 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
   .syn { margin-top: 14px; max-width: 62ch; color: #d9d3c9; line-height: 1.6; }
   .tl + .syn { margin-top: 10px; }
   .acts + .syn { margin-top: 26px; }
-  dl { margin: 26px 0 0; padding-top: 18px; border-top: 1px solid var(--line); display: grid; gap: 8px; font-size: 14.5px; }
+  .lb { margin: 30px 0 0; font-size: 12.5px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  dl { margin: 10px 0 0; padding-top: 14px; border-top: 1px solid var(--line); display: grid; gap: 8px; font-size: 14.5px; }
   dl div { display: grid; grid-template-columns: minmax(120px, 34%) 1fr; gap: 12px; }
   dt { color: var(--muted); } dd { margin: 0; }
-  .more { display: inline-block; margin-top: 26px; font-size: 14px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 26px; }
+  .more { display: inline-block; font-size: 14px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 2px; }
   .more:hover { color: var(--ink); border-color: var(--ink); }
   @media (min-width: 900px) {
     .sheet { align-items: center; padding: 32px; }

@@ -32,13 +32,34 @@
     "noteBy": ""
   },
   "credits": [
-    { "es": "Dirección", "en": "Directed by", "name": "David Rodríguez" },
-    { "es": "Producción", "en": "Produced by", "name": "David Rodríguez" }
+    {
+      "es": "Dirección",
+      "en": "Directed by",
+      "name": "David Rodríguez"
+    },
+    {
+      "es": "Producción",
+      "en": "Produced by",
+      "name": "David Rodríguez"
+    }
   ],
   "specs": [
-    { "es": "Formato de rodaje", "en": "Shooting format", "value": "DCI 4K" },
-    { "es": "Formato de finalización", "en": "Finishing format", "value": "DCP" },
-    { "es": "Idioma", "en": "Language", "value": "Español" }
+    {
+      "es": "Formato de rodaje",
+      "en": "Shooting format",
+      "value": "DCI 4K"
+    },
+    {
+      "es": "Formato de finalización",
+      "en": "Finishing format",
+      "value": "DCP"
+    },
+    {
+      "es": "Idioma",
+      "en": "Language",
+      "value": "Español",
+      "valueEn": "Spanish"
+    }
   ],
   "press": []
 }
