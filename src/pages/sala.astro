@@ -3,7 +3,7 @@
 import '@fontsource-variable/instrument-sans';
 import '@fontsource-variable/newsreader/wght-italic.css';
 import Isotipo from '../components/Isotipo.astro';
-import { films, settings, filmPath, pressPath, vimeoSrc, frameSrc } from '../lib/site';
+import { films, settings, filmPath, pressPath, videoSrc, frameSrc } from '../lib/site';
 
 const pick = (c: any) => ({ tagline: c.tagline || '', logline: c.logline || '', synopsis: c.synopsis || '', genre: c.genre || '' });
 const data = {
@@ -11,7 +11,7 @@ const data = {
   films: films.map((f) => ({
     slug: f.slug, max: (f as any).frameMax || 2560, v: (f as any).framesV || '', title: f.title, titleImage: f.titleImage || '', format: f.format, kind: f.kind, status: f.status,
     year: f.year || '', runtime: f.runtime || '', frames: f.frames || 0, focus: f.focus || '50% 50%',
-    watch: f.watch || 'none', trailer: vimeoSrc(f.trailerVimeoId), film: vimeoSrc(f.filmVimeoId),
+    watch: f.watch || 'none', trailer: videoSrc(f.trailerVimeoId), film: videoSrc(f.filmVimeoId),
     es: pick(f.es), en: pick(f.en),
     credits: f.credits || [],
     specs: (f.specs || []).map((k: any) => ({ es: k.es, en: k.en, vEs: k.value, vEn: k.valueEn || k.value })),

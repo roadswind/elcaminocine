@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Player from '../components/Player.astro';
-import { films, ui, routes, filmPath, pressPath, frameSrc, frameSet, mailto, type Lang, vimeoSrc } from '../lib/site';
+import { films, ui, routes, filmPath, pressPath, frameSrc, frameSet, mailto, type Lang, videoSrc } from '../lib/site';
 interface Props { lang: Lang; film: any }
 const { lang, film } = Astro.props;
 const t = ui[lang]; const r = routes[lang]; const c = film[lang];
@@ -16,15 +16,16 @@ const notify = mailto(`${film.title} — ${t.notify}`);
 const frames = Array.from({ length: film.frames }, (_, i) => i + 1);
 const bts = Array.from({ length: film.bts || 0 }, (_, i) => i + 1);
 const hasPress = film.press?.length > 0;
-const trailerSrc = vimeoSrc(film.trailerVimeoId);
-const filmSrc = !dev && film.watch === 'public' ? vimeoSrc(film.filmVimeoId) : '';
-// el reproductor principal muestra el tráiler; si aún no hay tráiler y la película está disponible, muestra la película
-const heroSrc = trailerSrc || filmSrc;
+const trailerSrc = videoSrc(film.trailerVimeoId);
+const filmSrc = !dev && film.watch === 'public' ? videoSrc(film.filmVimeoId) : '';
+// si la película está disponible, el botón principal la reproduce y el tráiler queda como secundario; si no, el principal es el tráiler
+const heroSrc = filmSrc || trailerSrc;
+const altSrc = filmSrc && trailerSrc ? trailerSrc : '';
 // frame de póster del reproductor (playerFrame en la ficha; por defecto el 1)
 const pf = Math.min(Math.max(1, (film as any).playerFrame || 1), film.frames || 1);
 ---
 <Base lang={lang} title={film.title} description={c.logline || undefined} alt={filmPath(other, film.slug)} current="films" image={film.frames ? frameSrc(film.slug, 1, 1600) : undefined}>
-  <Player src={heroSrc} poster={film.frames ? frameSrc(film.slug, pf, 1600) : ''} posterSet={film.frames ? frameSet(film.slug, pf) : undefined} label={trailerSrc ? t.playTrailer : t.watchFilm} soonLabel={dev ? t.status[film.status] : t.trailerSoon} focus={film.focus} title={film.title} />
+  <Player src={heroSrc} altSrc={altSrc} altLabel={t.playTrailer} poster={film.frames ? frameSrc(film.slug, pf, 1600) : ''} posterSet={film.frames ? frameSet(film.slug, pf) : undefined} label={filmSrc ? t.watchFilm : t.playTrailer} soonLabel={dev ? t.status[film.status] : t.trailerSoon} focus={film.focus} title={film.title} />
 
   <div class="wrap top">
     <div class="ttl">
@@ -36,7 +37,8 @@ const pf = Math.min(Math.max(1, (film as any).playerFrame || 1), film.frames || 
       {c.tagline && <p class="tl"><em>{c.tagline}</em></p>}
       {c.logline ? <p class="ll">{c.logline}</p> : <p class="ll muted">{t.detailsSoon}</p>}
       <div class="cta">
-        {!dev && filmSrc && <a class="btn" href={`${r.watch}#${film.slug}`}>{t.watchFilm} <span class="arr">→</span></a>}
+        {!dev && filmSrc && <a class="btn" href="#ver" data-play="main">{t.watchFilm} <span class="arr">↑</span></a>}
+        {!dev && filmSrc && trailerSrc && <a class="btn ghost" href="#ver" data-play="alt">{t.trailer}</a>}
         {!dev && film.watch !== 'public' && <a class="btn" href={`${r.watch}#${film.slug}`}>{t.watchSoon} <span class="arr">→</span></a>}
         {!dev && !filmSrc && notify && <a class="btn ghost" href={notify}>{t.notify}</a>}
         {dev && support && <a class="btn" href={support}>{t.support} <span class="arr">→</span></a>}

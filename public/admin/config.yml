@@ -35,8 +35,8 @@ collections:
       - { name: poster, label: Tiene póster, widget: boolean, default: false }
       - { name: bts, label: Fotos de detrás de cámaras, widget: number, value_type: int, default: 0 }
       - { name: clip, label: 'Clip para hover (.mp4 liviano)', widget: file, required: false }
-      - { name: trailerVimeoId, label: Enlace o ID de Vimeo del tráiler, required: false }
-      - { name: filmVimeoId, label: Enlace o ID de Vimeo de la película (pega el enlace completo si el video es oculto), required: false }
+      - { name: trailerVimeoId, label: Enlace del tráiler (YouTube o Vimeo), required: false }
+      - { name: filmVimeoId, label: Enlace de la película (Vimeo o YouTube; pega el enlace completo si el video es oculto), required: false }
       - { name: watch, label: En la Sala, widget: select, options: [{ label: No aparece, value: none }, { label: Próximamente, value: soon }, { label: Se puede ver, value: public }] }
       - &texts
         name: es

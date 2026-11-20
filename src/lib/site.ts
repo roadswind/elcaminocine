@@ -80,3 +80,12 @@ export function vimeoSrc(raw?: string): string {
   const h = (s.match(/[?&]h=([0-9a-f]+)/i) || s.match(new RegExp(id + '/([0-9a-f]{6,})', 'i')) || [])[1];
   return `https://player.vimeo.com/video/${id}?${h ? `h=${h}&` : ''}autoplay=1&dnt=1&title=0&byline=0&portrait=0&badge=0&playsinline=1&autopause=0`;
 }
+
+/** YouTube: acepta enlace (youtu.be, watch?v=, embed/, shorts/) o ID; usa youtube-nocookie y oculta videos sugeridos de otros canales. */
+export function youtubeSrc(raw?: string): string {
+  const s = String(raw || '').trim();
+  const id = (s.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/|\/live\/)([\w-]{11})/) || (/^[\w-]{11}$/.test(s) ? [s, s] : []))[1];
+  return id ? `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&color=white` : '';
+}
+/** Video de YouTube o Vimeo, según el enlace. */
+export const videoSrc = (raw?: string) => (/youtu\.?be/i.test(String(raw || '')) ? youtubeSrc(raw) : vimeoSrc(raw));

@@ -1,17 +1,21 @@
 ---
-// Reproductor de la ficha: muestra el póster y carga Vimeo solo al tocar play.
+// Reproductor de la ficha: muestra el póster y carga el video (Vimeo o YouTube) solo al tocar play.
+// Botón principal (src) y, opcional, uno secundario (altSrc), p. ej. película + tráiler.
 // Al reproducir, el recuadro toma la proporción real del video (sin barras) y el header se oculta para no tapar los controles.
-interface Props { src?: string; poster: string; posterSet?: string; label: string; soonLabel: string; focus?: string; title: string }
-const { src = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title } = Astro.props;
+interface Props { src?: string; altSrc?: string; altLabel?: string; poster: string; posterSet?: string; label: string; soonLabel: string; focus?: string; title: string }
+const { src = '', altSrc = '', altLabel = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title } = Astro.props;
 ---
 <div class="player-wrap">
-  <div class="player" data-src={src}>
+  <div class="player" id="ver" data-src={src} data-alt={altSrc || undefined}>
     {poster ? <img src={poster} srcset={posterSet} sizes="100vw" alt="" style={`object-position:${focus}`} fetchpriority="high" /> : <div class="blank"></div>}
     {src ? (
-      <button type="button" class="play" aria-label={`${label}: ${title}`}>
-        <span class="ring"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg></span>
-        <span class="label"><b>{label}</b></span>
-      </button>
+      <div class="ctrls">
+        <button type="button" class="play" data-kind="main" aria-label={`${label}: ${title}`}>
+          <span class="ring"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg></span>
+          <span class="label"><b>{label}</b></span>
+        </button>
+        {altSrc && <button type="button" class="alt label" data-kind="alt" aria-label={`${altLabel}: ${title}`}><b>{altLabel}</b></button>}
+      </div>
     ) : (
       <p class="soon label"><b>{soonLabel}</b></p>
     )}
@@ -30,7 +34,12 @@ const { src = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title 
   .player.playing::after { display: none; }
   .player.playing img { opacity: 0; }
   .player :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; z-index: 3; background: #000; }
-  .play { all: unset; cursor: pointer; position: absolute; z-index: 2; inset: 0; display: flex; flex-direction: column; gap: 16px; align-items: center; justify-content: center; }
+  .ctrls { position: absolute; z-index: 2; inset: 0; display: flex; flex-direction: column; gap: 18px; align-items: center; justify-content: center; }
+  .player.playing .ctrls { display: none; }
+  .play { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+  .alt { all: unset; cursor: pointer; font-size: 11px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; padding: 8px 14px; border: 1px solid rgba(236,231,222,.45); background: rgba(11,10,9,.35); backdrop-filter: blur(6px); transition: background .2s, color .2s, border-color .2s; }
+  .alt:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .alt:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
   .play .ring { width: 92px; height: 92px; border-radius: 50%; border: 1px solid var(--ink); display: grid; place-items: center; backdrop-filter: blur(6px); background: rgba(11,10,9,.25); transition: transform .25s, background .25s, color .25s; padding-left: 4px; }
   .play:hover .ring { transform: scale(1.07); background: var(--ink); color: var(--bg); }
   .play:focus-visible .ring { outline: 2px solid var(--ink); outline-offset: 5px; }
@@ -65,20 +74,37 @@ const { src = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title 
     if (rec.w && rec.h) rec.el.style.setProperty('--ar', (rec.w / rec.h).toFixed(4));
   });
 
-  document.querySelectorAll<HTMLElement>('.player[data-src]').forEach((p) => {
-    const src = p.dataset.src; const btn = p.querySelector('.play');
-    if (!src || !btn) return;
-    btn.addEventListener('click', () => {
-      const f = document.createElement('iframe');
-      f.src = src; f.referrerPolicy = 'strict-origin-when-cross-origin';
-      f.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media'; f.allowFullscreen = true; f.title = btn.getAttribute('aria-label') || 'Video';
-      p.appendChild(f); p.classList.add('playing'); btn.remove();
-      if (f.contentWindow) sizes.set(f.contentWindow, { el: p });
+  function play(p: HTMLElement, src: string, title: string) {
+    let f = p.querySelector('iframe');
+    if (!f) {
+      f = document.createElement('iframe');
+      f.referrerPolicy = 'strict-origin-when-cross-origin';
+      f.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media'; f.allowFullscreen = true;
+      p.appendChild(f);
+    }
+    f.title = title; f.src = src; p.classList.add('playing');
+    const fr = f;
+    if (src.startsWith(VIMEO)) {
+      if (fr.contentWindow) sizes.set(fr.contentWindow, { el: p });
       // por si el aviso «ready» llegó antes: pide las medidas también al cargar
-      f.addEventListener('load', () => setTimeout(() => ['getVideoWidth', 'getVideoHeight'].forEach((method) => f.contentWindow?.postMessage(JSON.stringify({ method }), VIMEO)), 400));
-      if (io) { if (watching) io.unobserve(watching); io.observe(p); watching = p; }
-      const top = p.getBoundingClientRect().top + window.scrollY;
-      if (Math.abs(window.scrollY - top) > 4) window.scrollTo({ top, behavior: 'smooth' });
-    });
+      fr.addEventListener('load', () => setTimeout(() => ['getVideoWidth', 'getVideoHeight'].forEach((method) => fr.contentWindow?.postMessage(JSON.stringify({ method }), VIMEO)), 400), { once: true });
+    }
+    if (io) { if (watching) io.unobserve(watching); io.observe(p); watching = p; }
+    const top = p.getBoundingClientRect().top + window.scrollY;
+    if (Math.abs(window.scrollY - top) > 4) window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll<HTMLElement>('.player[data-src]').forEach((p) => {
+    p.querySelectorAll<HTMLElement>('[data-kind]').forEach((b) => b.addEventListener('click', () => {
+      const src = b.dataset.kind === 'alt' ? p.dataset.alt : p.dataset.src;
+      if (src) play(p, src, b.getAttribute('aria-label') || 'Video');
+    }));
   });
+
+  // enlaces fuera del reproductor (p. ej. «Ver película», «Ver tráiler») que lo activan
+  document.querySelectorAll<HTMLElement>('[data-play]').forEach((a) => a.addEventListener('click', (e) => {
+    const p = document.querySelector<HTMLElement>('.player[data-src]'); if (!p) return;
+    const src = a.dataset.play === 'alt' ? p.dataset.alt : p.dataset.src; if (!src) return;
+    e.preventDefault(); play(p, src, a.textContent?.trim() || 'Video');
+  }));
 </script>
