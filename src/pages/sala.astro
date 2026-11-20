@@ -299,8 +299,10 @@ const og = new URL('/media/nancy-and-nancy/frame-01-1600.webp', Astro.site).href
   .panel.small .btn { width: 100%; }
 
   .theater { position: fixed; inset: 0; z-index: 50; background: #000; }
-  .screen { position: absolute; inset: 0; }
-  .screen iframe { width: 100%; height: 100%; border: 0; display: block; }
+  /* deja libres las zonas del notch y la barra de inicio para que los controles de Vimeo no queden cortados */
+  .screen { position: absolute; inset: 0; padding: var(--sat) env(safe-area-inset-right, 0px) var(--sab) env(safe-area-inset-left, 0px); }
+  @media (orientation: portrait) { .screen { padding-top: calc(64px + var(--sat)); } }
+  .screen iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
   .back { position: absolute; z-index: 2; top: calc(12px + var(--sat)); left: 12px; display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 14px 0 8px; border-radius: 999px; border: 0; cursor: pointer; background: rgba(20, 18, 16, .78); font-size: 14px; font-weight: 500; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 
   @media (max-width: 600px) {

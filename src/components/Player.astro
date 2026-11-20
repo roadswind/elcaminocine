@@ -1,33 +1,67 @@
 ---
+// Reproductor de la ficha: muestra el póster y carga Vimeo solo al tocar play.
+// Al reproducir, el recuadro toma la proporción real del video (sin barras) y el header se oculta para no tapar los controles.
 interface Props { src?: string; poster: string; posterSet?: string; label: string; soonLabel: string; focus?: string; title: string }
 const { src = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title } = Astro.props;
 ---
-<div class="player" data-src={src}>
-  {poster ? <img src={poster} srcset={posterSet} sizes="100vw" alt="" style={`object-position:${focus}`} fetchpriority="high" /> : <div class="blank"></div>}
-  {src ? (
-    <button type="button" class="play" aria-label={`${label}: ${title}`}>
-      <span class="ring"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg></span>
-      <span class="label"><b>{label}</b></span>
-    </button>
-  ) : (
-    <p class="soon label"><b>{soonLabel}</b></p>
-  )}
+<div class="player-wrap">
+  <div class="player" data-src={src}>
+    {poster ? <img src={poster} srcset={posterSet} sizes="100vw" alt="" style={`object-position:${focus}`} fetchpriority="high" /> : <div class="blank"></div>}
+    {src ? (
+      <button type="button" class="play" aria-label={`${label}: ${title}`}>
+        <span class="ring"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg></span>
+        <span class="label"><b>{label}</b></span>
+      </button>
+    ) : (
+      <p class="soon label"><b>{soonLabel}</b></p>
+    )}
+  </div>
 </div>
 <style>
-  .player { position: relative; aspect-ratio: 16 / 9; max-height: 100svh; width: 100%; background: #000; overflow: hidden; }
-  .player img, .player .blank { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* proporción por defecto: DCI 4K (4096×2160), la de los frames y masters de la casa */
+  .player-wrap { background: #000; }
+  .player { --ar: 1.8963; position: relative; aspect-ratio: var(--ar); width: min(100%, calc(100svh * var(--ar))); margin-inline: auto; background: #000; overflow: hidden; transition: aspect-ratio .35s ease; }
+  .player img, .player .blank { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .4s; }
   .player .blank { background: radial-gradient(120% 90% at 20% 0%, #24201b 0%, #0b0a09 65%); }
   .player::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,10,9,.9), rgba(11,10,9,0) 40%); pointer-events: none; }
   .player.playing::after { display: none; }
-  .player :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; z-index: 3; }
+  .player.playing img { opacity: 0; }
+  .player :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; z-index: 3; background: #000; }
   .play { all: unset; cursor: pointer; position: absolute; z-index: 2; inset: 0; display: flex; flex-direction: column; gap: 16px; align-items: center; justify-content: center; }
   .play .ring { width: 92px; height: 92px; border-radius: 50%; border: 1px solid var(--ink); display: grid; place-items: center; backdrop-filter: blur(6px); background: rgba(11,10,9,.25); transition: transform .25s, background .25s, color .25s; padding-left: 4px; }
   .play:hover .ring { transform: scale(1.07); background: var(--ink); color: var(--bg); }
   .play:focus-visible .ring { outline: 2px solid var(--ink); outline-offset: 5px; }
   .soon { position: absolute; z-index: 2; right: var(--gut); bottom: clamp(16px, 3vw, 32px); margin: 0; border: 1px solid var(--line); padding: 8px 12px; background: rgba(11,10,9,.5); backdrop-filter: blur(6px); }
-  @media (max-width: 700px) { .player { aspect-ratio: 4 / 3; } }
+  /* en celular el póster es más alto para que respire bajo el header; al reproducir pasa a la proporción del video */
+  @media (max-width: 700px) {
+    .player:not(.playing) { aspect-ratio: 4 / 3; width: 100%; }
+    .play .ring { width: 76px; height: 76px; }
+  }
+  :global(html.cine .site-head) { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+  :global(.site-head) { transition: transform .35s ease, opacity .35s ease, background .3s; }
 </style>
 <script>
+  const VIMEO = 'https://player.vimeo.com';
+  const sizes = new Map<Window, { el: HTMLElement; w?: number; h?: number }>();
+  let watching: HTMLElement | null = null;
+
+  // el header se oculta mientras el video está reproduciéndose y a la vista
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver((es) => {
+    es.forEach((e) => document.documentElement.classList.toggle('cine', e.isIntersecting && e.intersectionRatio > 0.6));
+  }, { threshold: [0, 0.6, 1] }) : null;
+
+  window.addEventListener('message', (e) => {
+    if (e.origin !== VIMEO || !e.source) return;
+    let d: any = e.data;
+    if (typeof d === 'string') { try { d = JSON.parse(d); } catch { return; } }
+    const rec = sizes.get(e.source as Window); if (!rec || !d) return;
+    const post = (method: string) => (e.source as Window).postMessage(JSON.stringify({ method }), VIMEO);
+    if (d.event === 'ready') { post('getVideoWidth'); post('getVideoHeight'); }
+    if (d.method === 'getVideoWidth') rec.w = Number(d.value);
+    if (d.method === 'getVideoHeight') rec.h = Number(d.value);
+    if (rec.w && rec.h) rec.el.style.setProperty('--ar', (rec.w / rec.h).toFixed(4));
+  });
+
   document.querySelectorAll<HTMLElement>('.player[data-src]').forEach((p) => {
     const src = p.dataset.src; const btn = p.querySelector('.play');
     if (!src || !btn) return;
@@ -36,6 +70,12 @@ const { src = '', poster, posterSet, label, soonLabel, focus = '50% 50%', title 
       f.src = src; f.referrerPolicy = 'strict-origin-when-cross-origin';
       f.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media'; f.allowFullscreen = true; f.title = btn.getAttribute('aria-label') || 'Video';
       p.appendChild(f); p.classList.add('playing'); btn.remove();
+      if (f.contentWindow) sizes.set(f.contentWindow, { el: p });
+      // por si el aviso «ready» llegó antes: pide las medidas también al cargar
+      f.addEventListener('load', () => setTimeout(() => ['getVideoWidth', 'getVideoHeight'].forEach((method) => f.contentWindow?.postMessage(JSON.stringify({ method }), VIMEO)), 400));
+      if (io) { if (watching) io.unobserve(watching); io.observe(p); watching = p; }
+      const top = p.getBoundingClientRect().top + window.scrollY;
+      if (Math.abs(window.scrollY - top) > 4) window.scrollTo({ top, behavior: 'smooth' });
     });
   });
 </script>

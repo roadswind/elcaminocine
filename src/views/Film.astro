@@ -60,7 +60,7 @@ const heroSrc = trailerSrc || filmSrc;
         </>}
         {film.specs.length > 0 && <>
           <h2 class="label" style="margin-top:36px">{t.specs}</h2>
-          <dl>{film.specs.map((k: any) => <div><dt>{k[lang]}</dt><dd>{k.value}</dd></div>)}</dl>
+          <dl>{film.specs.map((k: any) => <div><dt>{k[lang]}</dt><dd>{(lang === 'en' && k.valueEn) || k.value}</dd></div>)}</dl>
         </>}
       </section>
     </div>

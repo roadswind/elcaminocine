@@ -74,5 +74,5 @@ export function vimeoSrc(raw?: string): string {
   const id = (s.match(/(\d{6,})/) || [])[1];
   if (!id) return '';
   const h = (s.match(/[?&]h=([0-9a-f]+)/i) || s.match(new RegExp(id + '/([0-9a-f]{6,})', 'i')) || [])[1];
-  return `https://player.vimeo.com/video/${id}?${h ? `h=${h}&` : ''}autoplay=1&dnt=1&title=0&byline=0&portrait=0`;
+  return `https://player.vimeo.com/video/${id}?${h ? `h=${h}&` : ''}autoplay=1&dnt=1&title=0&byline=0&portrait=0&badge=0&playsinline=1&autopause=0`;
 }

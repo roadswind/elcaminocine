@@ -34,6 +34,11 @@
   },
   "credits": [
     {
+      "es": "Reparto",
+      "en": "Starring",
+      "name": "Vanessa Gamba, Andrea Alméciga"
+    },
+    {
       "es": "Dirección",
       "en": "Directed by",
       "name": "David Rodríguez"
@@ -56,12 +61,7 @@
     {
       "es": "Dirección de arte",
       "en": "Art Direction",
-      "name": "Enzo Leopardi"
-    },
-    {
-      "es": "Reparto",
-      "en": "Starring",
-      "name": "Vanessa Gamba, Andrea Alméciga"
+      "name": "Brunella Bianchi"
     }
   ],
   "specs": [
@@ -78,7 +78,8 @@
     {
       "es": "Idioma",
       "en": "Language",
-      "value": "Español"
+      "value": "Español e inglés",
+      "valueEn": "Spanish and English"
     }
   ],
   "press": [

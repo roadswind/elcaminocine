@@ -54,7 +54,7 @@ collections:
       - name: specs
         label: Ficha técnica
         widget: list
-        fields: [{ name: es, label: Dato (ES) }, { name: en, label: Dato (EN) }, { name: value, label: Valor }]
+        fields: [{ name: es, label: Dato (ES) }, { name: en, label: Dato (EN) }, { name: value, label: Valor }, { name: valueEn, label: Valor en inglés (si cambia), required: false }]
       - name: press
         label: Descargables de prensa
         widget: list
